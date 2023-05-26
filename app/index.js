@@ -43,8 +43,14 @@ export default function Page() {
       formData.append('username', email);
       formData.append('password', password);
       await axios.post(
-        'https://feriamaipo.herokuapp.com/usuarios/sign_in', formData
-        ).then(async (response) => {
+        'https://feriamaipo.herokuapp.com/usuarios/sign_in', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          transformRequest: (data, headers) => {
+            return formData;
+          }
+        }).then(async (response) => {
         if(response.status == 200){
           await saveToken(response.data.access_token);
           router.push('/home');
