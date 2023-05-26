@@ -5,10 +5,29 @@ import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const requirements = () => {
-	
+	const [user, setUser] = useState({});
 	const [requirements, setRequirements] = useState([]);
 	const router = useRouter();
 
+	const getActiveRequirements = async () => {
+		try {
+			const token = await AsyncStorage.getItem('authToken');
+			if(!token) return;
+			await axios.get('https://feriamaipo.herokuapp.com/requerimientos/activos/', {
+			})
+				.then((response) => {
+					console.log(response);
+					console.log(response.data);
+					setRequirements(response.data);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+		catch (error) {
+			console.log(error);
+		}
+	}
 
 	const getRequirements = async () => {
 		try {
@@ -43,9 +62,31 @@ const requirements = () => {
 		return `${day}/${month}/${year}`;
 	}
 
+	const getCurrentUser = async () => {
+		try {
+			const user = JSON.parse(await AsyncStorage.getItem('@user'));
+			if(!user) return;
+			setUser(user);
+		}
+		catch (error) {
+			console.log(error);
+		}
+	}
+
 	useEffect(() => {
-		getRequirements();
+		getCurrentUser();
 	}, []);
+	
+	useEffect(() => {
+		if (user?.rol === 'Cliente externo' || user?.rol === 'Cliente interno' || user?.rol === 'Administrador') {
+			getRequirements();
+		}
+	
+		if (user?.rol === 'Productor') {
+			console.log('productor');
+			getActiveRequirements();
+		}
+	}, [user]);
 
 
 	return(
@@ -55,11 +96,14 @@ const requirements = () => {
 			<Text
 				style={styles.title}
 			>
-				Mis requerimientos
+				{user?.rol === 'Cliente externo' &&  "Mis requerimientos" }
+				{user?.rol === 'Productor' &&  "Requerimientos activos" }
 			</Text>
 			<View
 				style={styles.requirements}
 			>
+			{requirements.length === 0 && <Text style={styles.text}>No hay requerimientos</Text>}
+		
 			{requirements.map((requirement) => (
 				<TouchableOpacity
 					style={styles.requirement}
