@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useRouter } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const requirements = () => {
 	
@@ -11,7 +12,13 @@ const requirements = () => {
 
 	const getRequirements = async () => {
 		try {
-			await axios.get('https://feriamaipo.herokuapp.com/requerimientos/')
+			const token = await AsyncStorage.getItem('authToken');
+			if(!token) return;
+			await axios.get('https://feriamaipo.herokuapp.com/usuarios/me/requerimientos', {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
 				.then((response) => {
 					console.log(response);
 					console.log(response.data);
