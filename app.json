@@ -5,6 +5,14 @@
       "bundler": "metro"
     },
     "name": "feria-2",
-    "slug": "feria-2"
+    "slug": "feria-2",
+    "extra": {
+      "eas": {
+        "projectId": "134b3163-371a-47aa-9166-bde873718ff6"
+      }
+    },
+    "android": {
+      "package": "com.zoopast.feria"
+    }
   }
 }
