@@ -52,7 +52,6 @@ export default function Page() {
       }).catch((error) => {
         console.log(error);
       });
-      Alert.alert('Success', 'Logged in successfully!');
     } catch (error) {
       Alert.alert('Error', 'Login failed. Please try again.');
     }
