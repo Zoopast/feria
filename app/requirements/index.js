@@ -16,8 +16,6 @@ const requirements = () => {
 			await axios.get('https://feriamaipo.herokuapp.com/requerimientos/activos/', {
 			})
 				.then((response) => {
-					console.log(response);
-					console.log(response.data);
 					setRequirements(response.data);
 				})
 				.catch((error) => {
@@ -39,8 +37,6 @@ const requirements = () => {
 				},
 			})
 				.then((response) => {
-					console.log(response);
-					console.log(response.data);
 					setRequirements(response.data);
 				})
 				.catch((error) => {
@@ -58,7 +54,7 @@ const requirements = () => {
 		const month = dateArray[1];
 		const dayArray = dateArray[2].split('T');
 		const day = dayArray[0];
-	
+
 		return `${day}/${month}/${year}`;
 	}
 
@@ -76,14 +72,13 @@ const requirements = () => {
 	useEffect(() => {
 		getCurrentUser();
 	}, []);
-	
+
 	useEffect(() => {
 		if (user?.rol === 'Cliente externo' || user?.rol === 'Cliente interno' || user?.rol === 'Administrador') {
 			getRequirements();
 		}
-	
+
 		if (user?.rol === 'Productor') {
-			console.log('productor');
 			getActiveRequirements();
 		}
 	}, [user]);
@@ -103,7 +98,7 @@ const requirements = () => {
 				style={styles.requirements}
 			>
 			{requirements.length === 0 && <Text style={styles.text}>No hay requerimientos</Text>}
-		
+
 			{requirements.map((requirement) => (
 				<TouchableOpacity
 					style={styles.requirement}

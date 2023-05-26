@@ -18,7 +18,7 @@ export default function Page() {
   const saveToken = async (jwtToken) => {
     try {
       await AsyncStorage.setItem('authToken', jwtToken);
-      
+
     } catch (error) {
       console.log('Error saving token:', error);
     }
@@ -79,6 +79,7 @@ export default function Page() {
         <TextInput
           placeholder="Email"
           value={email}
+          placeholderTextColor="white"
           onChangeText={setEmail}
           style={styles.textInput}
         />
@@ -86,14 +87,15 @@ export default function Page() {
         <TextInput
           placeholder="Password"
           value={password}
+          placeholderTextColor="white"
           onChangeText={setPassword}
           secureTextEntry
           style={styles.textInput}
         />
       </View>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.button}
-        title="Login" 
+        title="Login"
         onPress={handleLogin}>
         <Text
           style={{
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     backgroundColor: '#1e2124',
-    
+
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -137,12 +139,13 @@ const styles = StyleSheet.create({
       borderWidth: 1,
       marginTop: 8,
       padding: 10,
+      width: 300,
       borderRadius: 8,
       color: 'white',
   },
   forgotPassword: {
     marginTop: 20,
-    color: 'blue',
+    color: '#07a4b5',
 
   },
   button: {

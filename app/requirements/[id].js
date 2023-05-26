@@ -13,8 +13,6 @@ const requirement = () => {
 		try{
 			await axios.get(`https://feriamaipo.herokuapp.com/requerimientos/${id}`).then(
 				(response) => {
-					console.log(response);
-					console.log(response.data);
 					setRequirement(response.data);
 				}
 			).catch((error) => {
@@ -32,7 +30,7 @@ const requirement = () => {
 		const month = dateArray[1];
 		const dayArray = dateArray[2].split('T');
 		const day = dayArray[0];
-	
+
 		return `${day}/${month}/${year}`;
 	}
 
@@ -52,7 +50,7 @@ const requirement = () => {
 			</Text>
 			<View>
 				<View>
-						
+
 					{fields.map((field) => (
 						<View
 							style={styles.requirement}
@@ -69,7 +67,7 @@ const requirement = () => {
 								<Text
 									style={styles.text}
 								>
-									
+
 									{ (field === 'fecha_inicio' || field === 'fecha_fin') && formatDate(requirement[field]) }
 									{ (field === 'usuario') && requirement[field]?.nombre_usuario + ' ' + requirement[field]?.apellidos_usuario }
 									{ (field === 'estado' || field === 'calidad') && requirement[field] }
