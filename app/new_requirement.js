@@ -16,15 +16,14 @@ const newRequirement = () => {
 	const [calidad, setCalidad] = useState('');
 	const [productos, setProductos] = useState([
 		{ nombre: '', cantidad: 1 },
-		{ nombre: '', cantidad: 1 }
 	]);
 
 
 	const sendRequirement = async () => {
 		try {
 			const user = JSON.parse(await AsyncStorage.getItem('@user'));
-			console.log(user);
 			if(!user) return;
+
 			const requerimiento = {
 				id_usuario: user.id_usuario,
 				fecha_inicio: fechaInicio,
@@ -43,8 +42,9 @@ const newRequirement = () => {
 					productos: productos
 				}
 			).then((response) => {
-				console.log(response);
-				console.log(response.data);
+				if(response.status === 200) {
+					navigation.navigate('requirements')
+				}
 			}
 			).catch((error) => {
 				console.log(error);

@@ -50,6 +50,7 @@ const HomeScreen = () => {
       
       <Text style={styles.text}>Hola, {user?.nombre_usuario}</Text>
       <Text style={styles.text}>Bienvenido a Feria Maipo</Text>
+      {(user?.rol === 'Administrador' || user?.rol === 'Cliente externo' ) && (
       <View
         style={{
           gap: 20,
@@ -57,22 +58,68 @@ const HomeScreen = () => {
           marginBottom: 20,
         }}
       >
-      <TouchableOpacity
-        title="Nuevo requerimiento"
-        style={styles.button}
-        onPress={() => navigation.navigate('new_requirement')}
-      >
-        <Text style={{color: 'white'}}>Nuevo requerimiento</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        title="Ver requerimientos"
-        style={styles.button}
-        onPress={() => navigation.navigate('requirements')}
-      >
-        <Text style={{color: 'white'}}>Ver requerimientos</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          title="Nuevo requerimiento"
+          style={styles.button}
+          onPress={() => navigation.navigate('new_requirement')}
+        >
+          <Text style={{color: 'white'}}>Nuevo requerimiento</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          title="Ver requerimientos"
+          style={styles.button}
+          onPress={() => navigation.navigate('requirements')}
+        >
+          <Text style={{color: 'white'}}>Ver requerimientos</Text>
+        </TouchableOpacity>
       </View>
-
+      )}
+      { user?.rol === 'Productor' && (
+        <View
+          style={{
+            gap: 20,
+            paddingHorizontal: 20,
+            marginBottom: 20,
+          }}
+        >
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('requirements')}
+          >
+            <Text style={{color: 'white'}}>Ver nuevos requerimientos</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('requirements')}
+          >
+            <Text style={{color: 'white'}}>Ver requerimientos entregados</Text>
+          </TouchableOpacity>
+        </View>
+      )
+      }
+            { user?.rol === 'Transportista' && (
+        <View
+          style={{
+            gap: 20,
+            paddingHorizontal: 20,
+            marginBottom: 20,
+          }}
+        >
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('requirements')}
+          >
+            <Text style={{color: 'white'}}>Ver subastas activas</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('requirements')}
+          >
+            <Text style={{color: 'white'}}>Ver subastas ganadas</Text>
+          </TouchableOpacity>
+        </View>
+      )
+      }
       <TouchableOpacity
         title="Cerrar sesión"
         style={[styles.button, {backgroundColor: '#FF0000'}]}
@@ -80,6 +127,7 @@ const HomeScreen = () => {
           await AsyncStorage.removeItem('authToken');
           await AsyncStorage.removeItem('@user');
           setUser({});
+          navigation.navigate('/');
         }}
       >
         <Text style={{color: 'white'}}>Cerrar sesión</Text>
