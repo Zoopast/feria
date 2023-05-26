@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const formatDate = (date) => {
 	const year = date.getFullYear();
@@ -16,6 +18,43 @@ const newRequirement = () => {
 		{ nombre: '', cantidad: 1 },
 		{ nombre: '', cantidad: 1 }
 	]);
+
+
+	const sendRequirement = async () => {
+		try {
+			const user = JSON.parse(await AsyncStorage.getItem('@user'));
+			console.log(user);
+			if(!user) return;
+			const requerimiento = {
+				id_usuario: user.id_usuario,
+				fecha_inicio: fechaInicio,
+				fecha_fin: fechaTermino,
+				calidad: calidad,
+				productos: productos
+			}
+			console.log(requerimiento);
+			await axios.post(
+				'https://feriamaipo.herokuapp.com/requerimientos/',
+				{
+					id_usuario: user.id_usuario,
+					fecha_inicio: fechaInicio,
+					fecha_fin: fechaTermino,
+					calidad: calidad,
+					productos: productos
+				}
+			).then((response) => {
+				console.log(response);
+				console.log(response.data);
+			}
+			).catch((error) => {
+				console.log(error);
+			});
+		}
+		catch (error) {
+			console.log(error);
+		}
+	}
+
 	return (
 		<View
 			style={styles.container}
@@ -132,14 +171,7 @@ const newRequirement = () => {
 			))}
 			<TouchableOpacity
 				style={styles.submitButton}
-				onPress={() => {
-					console.log({
-						fechaInicio,
-						fechaTermino,
-						calidad,
-						productos
-					});
-				}}
+				onPress={sendRequirement}
 			>
 				<Text
 					style={styles.submitButtonText}
@@ -156,19 +188,21 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 50,
-    backgroundColor: '#fff',
+    backgroundColor: '#1e2124',
     alignItems: 'center',
     justifyContent: 'center',
   },
 	title: {
 		fontSize : 20,
 		fontWeight: 'bold',
-		marginBottom: 20
+		marginBottom: 20,
+		color: 'white'
 	},
 	subtitle: {
 		fontSize: 16,
 		fontWeight: 'bold',
-		marginBottom: 10
+		marginBottom: 10,
+		color: 'white'
 	},
 	textInput: {
 		height: 40,
@@ -176,7 +210,8 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		marginTop: 8,
 		padding: 10,
-		borderRadius: 8
+		borderRadius: 8,
+		color: 'white'
 	},
 	addButton: {
 		backgroundColor: 'green',

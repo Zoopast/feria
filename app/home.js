@@ -60,13 +60,14 @@ const HomeScreen = () => {
       <TouchableOpacity
         title="Nuevo requerimiento"
         style={styles.button}
-        onPress={() => navigation.navigate('Nuevo requerimiento')}
+        onPress={() => navigation.navigate('new_requirement')}
       >
         <Text style={{color: 'white'}}>Nuevo requerimiento</Text>
       </TouchableOpacity>
       <TouchableOpacity
         title="Ver requerimientos"
         style={styles.button}
+        onPress={() => navigation.navigate('requirements')}
       >
         <Text style={{color: 'white'}}>Ver requerimientos</Text>
       </TouchableOpacity>
@@ -90,12 +91,15 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1e2124',
+    color: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
   text: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: 'white',
   },
   button: {
     marginTop: 20,

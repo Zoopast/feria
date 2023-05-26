@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 50,
-    backgroundColor: '#fff',
+    backgroundColor: '#1e2124',
     
     alignItems: 'center',
     justifyContent: 'center',
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     fontSize : 20,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'white',
 
   },
   textInput: {
@@ -116,6 +117,7 @@ const styles = StyleSheet.create({
       marginTop: 8,
       padding: 10,
       borderRadius: 8,
+      color: 'white',
   },
   forgotPassword: {
     marginTop: 20,
