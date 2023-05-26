@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from "expo-router";
 
 const formatDate = (date) => {
 	const year = date.getFullYear();
@@ -11,12 +13,51 @@ const formatDate = (date) => {
 }
 
 const newRequirement = () => {
-	const [fechaInicio, setFechaInicio] = useState(formatDate(new Date()));
-	const [fechaTermino, setFechaTermino] = useState('');
+  const [fechaInicio, setFechaInicio] = useState(new Date());
+  const [fechaTermino, setFechaTermino] = useState(new Date());
+  const [showInicio, setShowInicio] = useState(false);
+  const [showTermino, setShowTermino] = useState(false);
 	const [calidad, setCalidad] = useState('');
 	const [productos, setProductos] = useState([
 		{ nombre: '', cantidad: 1 },
 	]);
+  const [date, setDate] = useState(new Date(1598051730000));
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false);
+
+	const router = useRouter();
+
+  const onChangeInicio = (event, selectedDate) => {
+    const currentDate = selectedDate || fechaInicio;
+    setShowInicio(Platform.OS === 'ios');
+    setFechaInicio(currentDate);
+  };
+
+  const showDatepickerInicio = () => {
+    setShowInicio(true);
+  };
+
+  const onChangeTermino = (event, selectedDate) => {
+    const currentDate = selectedDate || fechaTermino;
+    setShowTermino(Platform.OS === 'ios');
+    setFechaTermino(currentDate);
+  };
+
+  const showDatepickerTermino = () => {
+    setShowTermino(true);
+  };
+
+
+  const showMode = (currentMode) => {
+    if (Platform.OS === 'android') {
+      setShow(true);
+    }
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+  };
 
 
 	const sendRequirement = async () => {
@@ -26,12 +67,11 @@ const newRequirement = () => {
 
 			const requerimiento = {
 				id_usuario: user.id_usuario,
-				fecha_inicio: fechaInicio,
-				fecha_fin: fechaTermino,
+				fecha_inicio: formatDate(fechaInicio),
+				fecha_fin: formatDate(fechaTermino),
 				calidad: calidad,
 				productos: productos
 			}
-			console.log(requerimiento);
 			await axios.post(
 				'https://feriamaipo.herokuapp.com/requerimientos/',
 				{
@@ -43,7 +83,7 @@ const newRequirement = () => {
 				}
 			).then((response) => {
 				if(response.status === 200) {
-					navigation.navigate('requirements')
+					router.push('/requirements')
 				}
 			}
 			).catch((error) => {
@@ -64,30 +104,37 @@ const newRequirement = () => {
 			>
 				Nuevo requerimiento
 			</Text>
-			<Text
-				style={styles.subtitle}
-			>
-				Fecha inicio
-			</Text>
-			<TextInput 
-				style={styles.textInput}
-				placeholder="Fecha de inicio"
-				value={fechaInicio}
-				onChangeText={setFechaInicio}
-				keyboardType='date'
-			/>
-			<Text
-				style={styles.subtitle}
-			>
-				Fecha termino
-			</Text>
-			<TextInput
-				style={styles.textInput}
-				placeholder="Fecha de termino"
-				value={fechaTermino}
-				onChangeText={setFechaTermino}
-				keyboardType='date'
-			/>
+			<Text style={styles.subtitle}>Fecha inicio</Text>
+      <TextInput style={styles.textInput} placeholder="Fecha de inicio" value={formatDate(fechaInicio)} />
+      <TouchableOpacity onPress={showDatepickerInicio}>
+        <Text style={styles.subtitle}>Seleccionar fecha</Text>
+      </TouchableOpacity>
+      {showInicio && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={fechaInicio}
+          mode='date'
+          is24Hour={true}
+          display="default"
+          onChange={onChangeInicio}
+        />
+      )}
+
+      <Text style={styles.subtitle}>Fecha termino</Text>
+      <TextInput placeholderTextColor="white" style={styles.textInput} placeholder="Fecha de termino" value={formatDate(fechaTermino)} />
+      <TouchableOpacity onPress={showDatepickerTermino}>
+        <Text style={styles.subtitle}>Seleccionar fecha</Text>
+      </TouchableOpacity>
+      {showTermino && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={fechaTermino}
+          mode='date'
+          is24Hour={true}
+          display="default"
+          onChange={onChangeTermino}
+        />
+      )}
 			<Text
 				style={styles.subtitle}
 			>
@@ -96,79 +143,76 @@ const newRequirement = () => {
 			<TextInput
 				style={styles.textInput}
 				placeholder="Calidad"
+				placeholderTextColor="white"
 				value={calidad}
 				onChangeText={setCalidad}
 			/>
 			<Text
 				style={styles.title}
 			>Productos</Text>
-			<View
-				style={{
-					flexDirection: 'row',
-					justifyContent: 'space-between',
-					gap: 10,
-				}}
-			>
-				<TouchableOpacity
-					style={styles.addButton}
-					onPress={() => {
-						const newProductos = [...productos];
-						newProductos.push({ nombre: '', cantidad: 1 });
-						setProductos(newProductos);
-					}}
-				>
-					<Text
-						style={styles.addButtonText}
-					>
-						Agregar producto
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.deleteButton}
-					onPress={() => {
-						const newProductos = [...productos];
-						newProductos.pop();
-						setProductos(newProductos);
-					}}
-				>
-					<Text
-						style={styles.deleteButtonText}
-					>
-						Eliminar producto
-					</Text>
-				</TouchableOpacity>
-			</View>
-			{productos.map((producto, index) => (
-				<View
-					key={index}
-					style={{
-						flexDirection: 'row',
-						justifyContent: 'space-between',
-						gap: 10,
-					}}
-				>
-					<TextInput
-						style={styles.textInput}
-						placeholder="Nombre"
-						value={producto.nombre}
-						onChangeText={text => {
-							const newProductos = [...productos];
-							newProductos[index].nombre = text;
-							setProductos(newProductos);
-						}}
-					/>
-					<TextInput
-						style={styles.textInput}
-						placeholder="Cantidad"
-						value={producto.cantidad}
-						onChangeText={text => {
-							const newProductos = [...productos];
-							newProductos[index].cantidad = text;
-							setProductos(newProductos);
-						}}
-					/>
-				</View>
-			))}
+			   <ScrollView>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          gap: 10,
+        }}
+      >
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            const newProductos = [...productos];
+            newProductos.push({ nombre: '', cantidad: 1 });
+            setProductos(newProductos);
+          }}
+        >
+          <Text style={styles.addButtonText}>Agregar producto</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => {
+            const newProductos = [...productos];
+            newProductos.pop();
+            setProductos(newProductos);
+          }}
+        >
+          <Text style={styles.deleteButtonText}>Eliminar producto</Text>
+        </TouchableOpacity>
+      </View>
+
+      {productos.map((producto, index) => (
+        <View
+          key={index}
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            gap: 10,
+          }}
+        >
+          <TextInput
+            style={styles.textInput}
+            placeholder="Nombre"
+            value={producto.nombre}
+						placeholderTextColor="white"
+            onChangeText={text => {
+              const newProductos = [...productos];
+              newProductos[index].nombre = text;
+              setProductos(newProductos);
+            }}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Cantidad"
+            value={producto.cantidad.toString()}
+            onChangeText={text => {
+              const newProductos = [...productos];
+              newProductos[index].cantidad = text;
+              setProductos(newProductos);
+            }}
+          />
+        </View>
+      ))}
+    </ScrollView>
 			<TouchableOpacity
 				style={styles.submitButton}
 				onPress={sendRequirement}
@@ -176,7 +220,7 @@ const newRequirement = () => {
 				<Text
 					style={styles.submitButtonText}
 				>
-					Agregar requerimiento
+					Hacer requerimiento
 				</Text>
 			</TouchableOpacity>
 		</View>
@@ -211,7 +255,8 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 		padding: 10,
 		borderRadius: 8,
-		color: 'white'
+		color: 'white',
+		placeholder: 'white'
 	},
 	addButton: {
 		backgroundColor: 'green',
