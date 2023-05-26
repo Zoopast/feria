@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Link } from "expo-router";
 import { StyleSheet, Text, View, TextInput, Alert, TouchableOpacity } from 'react-native';
@@ -11,6 +11,10 @@ export default function Page() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+    checkIfUserIsLoggedIn();
+  }, []);
+
   const saveToken = async (jwtToken) => {
     try {
       await AsyncStorage.setItem('authToken', jwtToken);
@@ -19,6 +23,18 @@ export default function Page() {
       console.log('Error saving token:', error);
     }
   };
+
+  const checkIfUserIsLoggedIn = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      const user = JSON.parse(await AsyncStorage.getItem('@user'));
+      if ((token !== null) && (user !== null)) {
+        router.push('/home');
+      }
+    } catch (error) {
+      console.log('Error checking if user is logged in:', error);
+    }
+  }
 
   const handleLogin = async () => {
     try {
