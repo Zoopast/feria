@@ -65,19 +65,12 @@ const newRequirement = () => {
 			const user = JSON.parse(await AsyncStorage.getItem('@user'));
 			if(!user) return;
 
-			const requerimiento = {
-				id_usuario: user.id_usuario,
-				fecha_inicio: formatDate(fechaInicio),
-				fecha_fin: formatDate(fechaTermino),
-				calidad: calidad,
-				productos: productos
-			}
 			await axios.post(
 				'https://feriamaipo.herokuapp.com/requerimientos/',
 				{
 					id_usuario: user.id_usuario,
-					fecha_inicio: fechaInicio,
-					fecha_fin: fechaTermino,
+					fecha_inicio: formatDate(fechaInicio),
+					fecha_fin: formatDate(fechaTermino),
 					calidad: calidad,
 					productos: productos
 				}
@@ -255,8 +248,7 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 		padding: 10,
 		borderRadius: 8,
-		color: 'white',
-		placeholder: 'white'
+		color: 'white'
 	},
 	addButton: {
 		backgroundColor: 'green',
