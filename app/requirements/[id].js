@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useRouter, useLocalSearchParams } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Requirement = () => {
     const { id } = useLocalSearchParams();
@@ -9,16 +10,28 @@ const Requirement = () => {
     const router = useRouter();
     const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'calidad', 'productos'];
     const [ofertas, setOfertas] = useState([]);
-
+    const [user, setUser] = useState({});
     useEffect(() => {
+        getUser();
         getRequirement();
     }, []);
 
+    useEffect(() => {
+        fillProductsOfertas();
+    }, [requirement]);
+
+    const getUser = async () => {
+        const user = JSON.parse(await AsyncStorage.getItem('@user'));
+        if(!user) return;
+
+        setUser(user);
+    }
+
     const getRequirement = async () => {
-        try {
+        try{
             const response = await axios.get(`https://feriamaipo.herokuapp.com/requerimientos/${id}`);
             setRequirement(response.data);
-        } catch (error) {
+        }catch(error) {
             console.log(error);
         }
     };
@@ -27,12 +40,36 @@ const Requirement = () => {
         const productsOfertas = [];
         requirement.productos?.map((product) => {
             productsOfertas.push({
-                id_producto: product.id_producto,
+                id_requerimiento: requirement.id_requerimiento,
+                id_producto_requerimiento: product.id_producto,
+                id_productor: user.id_usuario,
                 cantidad: product.cantidad,
-                precio: 0,
+                precio: "0",
             });
         });
+        setOfertas(productsOfertas);
+        console.log(productsOfertas)
         return productsOfertas;
+    }
+
+    const filterOfertasWithNonValidValues = () => {
+        return ofertas.filter((oferta) => oferta.precio !== "0");
+    }
+
+    const createOferta = async () => {
+
+        try {
+            await axios.post(
+                'https://feriamaipo.herokuapp.com/requerimientos/productos/oferta/',
+                {
+                    ofertas: filterOfertasWithNonValidValues()
+                }
+            ).then((response) => {
+                console.log(response);
+            });
+        }catch(e) {
+            console.log(e);
+        }
     }
 
     const formatDate = (date) => {
@@ -82,21 +119,36 @@ const Requirement = () => {
                                 <Text style={styles.fieldTitle}>Nombre: {product.nombre}</Text>
                                 <Text style={styles.fieldTitle}>Cantidad total: {product.cantidad}</Text>
                                 <TextInput
-                                    style={styles.field}
+                                    value={ofertas[idx]?.cantidad.toString()}
+                                    style={[{color: "white"},styles.field]}
                                     placeholder="Cantidad a ofertar"
                                     placeholderTextColor={'#BDBDBD'}
+                                    onChangeText={text => {
+                                        const newOfertas = [...ofertas];
+                                        newOfertas[idx].cantidad = text;
+                                        setOfertas(newOfertas);
+                                    }}
                                 />
                                 <TextInput
-                                    style={styles.field}
+                                    value={ofertas[idx]?.precio.toString()}
+                                    style={[{color: "white"},styles.field]}
                                     placeholder="Precio"
                                     placeholderTextColor={'#BDBDBD'}
+                                    onChangeText={text => {
+                                        const newOfertas = [...ofertas];
+                                        newOfertas[idx].precio = text;
+                                        setOfertas(newOfertas);
+                                    }}
                                 />
                             </View>
                         ))}
                         <TouchableOpacity
+                            onPress={createOferta}
                             style={styles.field}
                         >
-                            <Text>Ofertar</Text>
+                            <Text
+                                style={styles.fieldTitle}
+                            >Ofertar</Text>
                         </TouchableOpacity>
                     </View>)}
                 </ScrollView>
