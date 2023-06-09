@@ -54,23 +54,24 @@ const Requirement = () => {
 
     const filterOfertasWithNonValidValues = () => {
         return ofertas.filter((oferta) => oferta.precio !== "0");
-    }
+      }
 
-    const createOferta = async () => {
-
+      const createOferta = async () => {
         try {
-            await axios.post(
-                'https://feriamaipo.herokuapp.com/requerimientos/productos/oferta/',
-                {
-                    ofertas: filterOfertasWithNonValidValues()
-                }
-            ).then((response) => {
-                console.log(response);
-            });
-        }catch(e) {
-            console.log(e);
+          const validOfertas = filterOfertasWithNonValidValues();
+
+          await axios.post(
+            'https://feriamaipo.herokuapp.com/requerimientos/productos/oferta/',
+            validOfertas
+          ).then((response) => {
+            if(response.status === 200) {
+                router.push('/requirements');
+            }
+          });
+        } catch (e) {
+          console.log(e);
         }
-    }
+      }
 
     const formatDate = (date) => {
         const dateArray = date?.split('-');
