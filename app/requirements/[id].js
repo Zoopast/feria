@@ -120,28 +120,43 @@ const Requirement = () => {
                             <View key={idx} style={styles.field}>
                                 <Text style={styles.fieldTitle}>Nombre: {product.nombre}</Text>
                                 <Text style={styles.fieldTitle}>Cantidad total: {product.cantidad}</Text>
-                                <TextInput
-                                    value={ofertas[idx]?.cantidad.toString()}
-                                    style={[{color: "white"},styles.field]}
-                                    placeholder="Cantidad a ofertar"
-                                    placeholderTextColor={'#BDBDBD'}
-                                    onChangeText={text => {
-                                        const newOfertas = [...ofertas];
-                                        newOfertas[idx].cantidad = text;
-                                        setOfertas(newOfertas);
+
+                                <View
+                                    style={{
+                                        marginTop: 10
                                     }}
-                                />
-                                <TextInput
-                                    value={ofertas[idx]?.precio.toString()}
-                                    style={[{color: "white"},styles.field]}
-                                    placeholder="Precio"
-                                    placeholderTextColor={'#BDBDBD'}
-                                    onChangeText={text => {
-                                        const newOfertas = [...ofertas];
-                                        newOfertas[idx].precio = text;
-                                        setOfertas(newOfertas);
+                                >
+                                    <Text style={styles.fieldTitle}> Cantidad a ofertar </Text>
+                                    <TextInput
+                                        value={ofertas[idx]?.cantidad.toString()}
+                                        style={[{color: "white"},styles.field]}
+                                        placeholder="Cantidad a ofertar"
+                                        placeholderTextColor={'#BDBDBD'}
+                                        onChangeText={text => {
+                                            const newOfertas = [...ofertas];
+                                            newOfertas[idx].cantidad = text;
+                                            setOfertas(newOfertas);
+                                        }}
+                                    />
+                                </View>
+                                <View
+                                    style={{
+                                        marginTop: 10
                                     }}
-                                />
+                                >
+                                    <Text style={styles.fieldTitle}>Precio</Text>
+                                    <TextInput
+                                        value={ofertas[idx]?.precio.toString()}
+                                        style={[{color: "white"},styles.field]}
+                                        placeholder="Precio"
+                                        placeholderTextColor={'#BDBDBD'}
+                                        onChangeText={text => {
+                                            const newOfertas = [...ofertas];
+                                            newOfertas[idx].precio = text;
+                                            setOfertas(newOfertas);
+                                        }}
+                                    />
+                                </View>
                             </View>
                         ))}
                         <TouchableOpacity
