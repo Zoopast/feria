@@ -8,7 +8,7 @@ const Requirement = () => {
     const { id } = useLocalSearchParams();
     const [requirement, setRequirement] = useState({});
     const router = useRouter();
-    const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'calidad', 'productos'];
+    const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'productos'];
     const [ofertas, setOfertas] = useState([]);
     const [user, setUser] = useState({});
     useEffect(() => {
@@ -95,11 +95,12 @@ const Requirement = () => {
                             {
                                 (field === 'fecha_inicio' || field === 'fecha_fin') ? formatDate(requirement[field]) :
                                 (field === 'usuario') ? requirement[field]?.nombre_usuario + ' ' + requirement[field]?.apellidos_usuario :
-                                (field === 'estado' || field === 'calidad') ? requirement[field] :
+                                (field === 'estado') ? requirement[field] :
                                 (field === 'productos') ? requirement[field]?.map((product, idx) => (
                                     <View key={idx}>
                                         <Text style={styles.text}>Nombre: {product.nombre}</Text>
                                         <Text style={styles.text}>Cantidad: {product.cantidad}</Text>
+                                        <Text style={styles.text}>Calidad: {product.calidad}</Text>
                                     </View>
                                 )) : null
                             }
