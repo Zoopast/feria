@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import axios from 'axios';
@@ -17,11 +18,9 @@ const newRequirement = () => {
   const [fechaTermino, setFechaTermino] = useState(new Date());
   const [showInicio, setShowInicio] = useState(false);
   const [showTermino, setShowTermino] = useState(false);
-	const [calidad, setCalidad] = useState('');
 	const [productos, setProductos] = useState([
-		{ nombre: '', cantidad: 1 },
+		{ nombre: '', cantidad: 1, calidad: '' },
 	]);
-  const [date, setDate] = useState(new Date(1598051730000));
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
 
@@ -71,7 +70,6 @@ const newRequirement = () => {
 					id_usuario: user.id_usuario,
 					fecha_inicio: formatDate(fechaInicio),
 					fecha_fin: formatDate(fechaTermino),
-					calidad: calidad,
 					productos: productos
 				}
 			).then((response) => {
@@ -129,18 +127,6 @@ const newRequirement = () => {
         />
       )}
 			<Text
-				style={styles.subtitle}
-			>
-				Calidad
-			</Text>
-			<TextInput
-				style={styles.textInput}
-				placeholder="Calidad"
-				placeholderTextColor="white"
-				value={calidad}
-				onChangeText={setCalidad}
-			/>
-			<Text
 				style={styles.title}
 			>Productos</Text>
 			   <ScrollView>
@@ -155,7 +141,7 @@ const newRequirement = () => {
           style={styles.addButton}
           onPress={() => {
             const newProductos = [...productos];
-            newProductos.push({ nombre: '', cantidad: 1 });
+            newProductos.push({ nombre: '', cantidad: 1, calidad: '' });
             setProductos(newProductos);
           }}
         >
@@ -182,27 +168,80 @@ const newRequirement = () => {
             gap: 10,
           }}
         >
-          <TextInput
-            style={styles.textInput}
-            placeholder="Nombre"
-            value={producto.nombre}
-						placeholderTextColor="white"
-            onChangeText={text => {
-              const newProductos = [...productos];
-              newProductos[index].nombre = text;
-              setProductos(newProductos);
+          <View
+            style={{
+              position: 'relative',
+
             }}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Cantidad"
-            value={producto.cantidad.toString()}
-            onChangeText={text => {
-              const newProductos = [...productos];
-              newProductos[index].cantidad = text;
-              setProductos(newProductos);
+          >
+            <Text style={styles.subtitle}>Producto {index + 1}</Text>
+            <Text style={styles.subtitle}> { producto.nombre } </Text>
+            <View>
+              <Picker
+                selectedValue={producto.nombre}
+                onValueChange={(itemValue, itemIndex) =>{
+                  const newProductos = [...productos];
+                  newProductos[index].nombre = itemValue;
+                  setProductos(newProductos);
+                }}>
+                <Picker.Item label="Manzana" value="Manzana" />
+                <Picker.Item label="Plátano" value="Plátano" />
+                <Picker.Item label="Naranja" value="Naranja" />
+                <Picker.Item label="Fresa" value="Fresa" />
+                <Picker.Item label="Sandía" value="Sandía" />
+                <Picker.Item label="Uva" value="Uva" />
+                <Picker.Item label="Pera" value="Pera" />
+                <Picker.Item label="Piña" value="Piña" />
+                <Picker.Item label="Melón" value="Melón" />
+                <Picker.Item label="Mango" value="Mango" />
+                <Picker.Item label="Papaya" value="Papaya" />
+                <Picker.Item label="Kiwi" value="Kiwi" />
+                <Picker.Item label="Cereza" value="Cereza" />
+                <Picker.Item label="Limón" value="Limón" />
+                <Picker.Item label="Mandarina" value="Mandarina" />
+                <Picker.Item label="Pepino" value="Pepino" />
+                <Picker.Item label="Zanahoria" value="Zanahoria" />
+                <Picker.Item label="Lechuga" value="Lechuga" />
+                <Picker.Item label="Espinaca" value="Espinaca" />
+                <Picker.Item label="Calabacín" value="Calabacín" />
+              </Picker>
+          </View>
+          </View>
+          <View>
+            <Text style={styles.subtitle}>Cantidad</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Cantidad"
+              value={producto.cantidad.toString()}
+              onChangeText={text => {
+                const newProductos = [...productos];
+                newProductos[index].cantidad = text;
+                setProductos(newProductos);
+              }}
+            />
+          </View>
+          <View
+            style={{
+              position: 'relative',
+
             }}
-          />
+          >
+            <Text style={styles.title}>Calidad</Text>
+            <Text style={styles.subtitle}> { producto.calidad } </Text>
+            <Picker
+              selectedValue={producto.calidad}
+              onValueChange={(itemValue, itemIndex) =>{
+                const newProductos = [...productos];
+                newProductos[index].calidad = itemValue;
+                setProductos(newProductos);
+              }}>
+              <Picker.Item label="Fresca" value="Fresca" />
+              <Picker.Item label="Madura" value="Madura" />
+              <Picker.Item label="Dulce" value="Dulce" />
+              <Picker.Item label="Sabrosa" value="Sabrosa" />
+              <Picker.Item label="Jugosa" value="Jugosa" />
+            </Picker>
+          </View>
         </View>
       ))}
     </ScrollView>
