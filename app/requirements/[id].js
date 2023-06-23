@@ -36,6 +36,17 @@ const Requirement = () => {
         }
     };
 
+    const finalize = async () => {
+        try{
+            const response = await axios.put(`https://feriamaipo.herokuapp.com/requerimientos/${id}/finalizar/`);
+            if(response.status === 200) {
+                router.push('/requirements/mine');
+            }
+        }catch(error) {
+            console.log(error);
+        }
+    }
+
     const fillProductsOfertas = () => {
         const productsOfertas = [];
         requirement.productos?.map((product) => {
@@ -171,11 +182,41 @@ const Requirement = () => {
                         </TouchableOpacity>
                     </View>)}
                 </ScrollView>
+                {
+                    requirement.estado === "entregado" &&
+                    <View>
+                        <Text style={styles.receivedTitle}>Confirmar entrega</Text>
+                        <TouchableOpacity style={styles.receivedButton} onPress={finalize}>
+                            <Text style={styles.receivedButtonText}>Recibí mis productos</Text>
+                        </TouchableOpacity>
+                    </View>
+                }
         </View>
     )
 }
 
 const styles = StyleSheet.create({
+    receivedTitle: {
+        fontSize: 20,
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    receivedButton: {
+		backgroundColor: '#282b30',
+		padding: 10,
+		marginTop: 10,
+		marginBottom: 10,
+		borderWidth: 1,
+		borderColor: 'green',
+	},
+    receivedButtonText: {
+		color: 'white',
+		fontSize: 15,
+		textAlign: 'center'
+	},
     container: {
         flex: 1,
         backgroundColor: '#1e2124',
