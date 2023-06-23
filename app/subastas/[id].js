@@ -20,8 +20,8 @@ const Requirement = () => {
 		const [auctionInfo, setAuctionInfo] = useState({});
 		const [precioOferta, setPrecioOferta] = useState(1);
     const [user, setUser] = useState({});
-		const [fechaInicio, setFechaInicio] = useState(getDate());
-		const [fechaTermino, setFechaTermino] = useState(getDate());
+		const [fechaInicio, setFechaInicio] = useState(new Date());
+		const [fechaTermino, setFechaTermino] = useState(new Date());
 		const [showInicio, setShowInicio] = useState(false);
 		const [showTermino, setShowTermino] = useState(false);
 
@@ -54,6 +54,9 @@ const Requirement = () => {
 			const currentDate = selectedDate || fechaInicio;
 			setShowInicio(Platform.OS === 'ios');
 			setFechaInicio(currentDate);
+			if(currentDate && currentDate > fechaTermino) {
+				setFechaTermino(currentDate);
+			}
 		};
 
 		const showDatepickerInicio = () => {
@@ -114,17 +117,13 @@ const Requirement = () => {
 			setMode(currentMode);
 		};
 
-	const formatDate = (date) => {
-			if (!date) return '';
-			const dateArray = date?.split('-');
-			if(!dateArray) return '';
-			const year = dateArray[0];
-			const month = dateArray[1];
-			const dayArray = dateArray[2].split('T');
-			const day = dayArray[0];
-
+		const formatDate = (date) => {
+			console.log
+			const year = date.getFullYear();
+			const month = date.getMonth() + 1;
+			const day = date.getDate();
 			return `${day}/${month}/${year}`;
-	}
+		}
 
     return(
         <View style={styles.container}>
@@ -135,9 +134,9 @@ const Requirement = () => {
 								<Text style={styles.fieldTitle}>Usuario</Text>
 								<Text style={styles.text}> { auctionInfo.requerimiento?.usuario.nombre } </Text>
 								<Text style={styles.fieldTitle}>Fecha inicio subasta</Text>
-								<Text style={styles.text}> { formatDate(auctionInfo.subasta?.fecha_inicio) } </Text>
+								<Text style={styles.text}> { formatDate(new Date(auctionInfo.subasta?.fecha_inicio)) } </Text>
 								<Text style={styles.fieldTitle}>Fecha termino subasta</Text>
-								<Text style={styles.text}> { formatDate(auctionInfo.subasta?.fecha_fin) } </Text>
+								<Text style={styles.text}> { formatDate(new Date(auctionInfo.subasta?.fecha_fin)) } </Text>
 								<Text style={styles.fieldTitle}>Estado subasta</Text>
 								<Text style={styles.text}> { auctionInfo.subasta?.estado } </Text>
 								<Text style={styles.fieldTitle}>Produtos</Text>
@@ -165,6 +164,7 @@ const Requirement = () => {
 							{showInicio && (
 								<DateTimePicker
 									testID="dateTimePicker"
+									minimumDate={new Date()}
 									value={fechaInicio}
 									mode='date'
 									is24Hour={true}
@@ -183,6 +183,7 @@ const Requirement = () => {
 									testID="dateTimePicker"
 									value={fechaTermino}
 									mode='date'
+									minimumDate={fechaInicio}
 									is24Hour={true}
 									display="default"
 									onChange={onChangeTermino}

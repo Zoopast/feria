@@ -31,6 +31,10 @@ const newRequirement = () => {
     const currentDate = selectedDate || fechaInicio;
     setShowInicio(Platform.OS === 'ios');
     setFechaInicio(currentDate);
+
+    if(currentDate && currentDate > fechaTermino) {
+      setFechaTermino(currentDate);
+    }
   };
 
   const showDatepickerInicio = () => {
@@ -106,6 +110,7 @@ const newRequirement = () => {
         <DateTimePicker
           testID="dateTimePicker"
           value={fechaInicio}
+          minimumDate={new Date()}
           mode='date'
           is24Hour={true}
           display="default"
@@ -122,6 +127,7 @@ const newRequirement = () => {
         <DateTimePicker
           testID="dateTimePicker"
           value={fechaTermino}
+          minimumDate={fechaInicio}
           mode='date'
           is24Hour={true}
           display="default"
