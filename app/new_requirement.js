@@ -16,6 +16,7 @@ const formatDate = (date) => {
 const newRequirement = () => {
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaTermino, setFechaTermino] = useState(new Date());
+  const [direccion, setDireccion] = useState('');
   const [showInicio, setShowInicio] = useState(false);
   const [showTermino, setShowTermino] = useState(false);
 	const [productos, setProductos] = useState([
@@ -70,6 +71,7 @@ const newRequirement = () => {
 					id_usuario: user.id_usuario,
 					fecha_inicio: formatDate(fechaInicio),
 					fecha_fin: formatDate(fechaTermino),
+          direccion: direccion,
 					productos: productos
 				}
 			).then((response) => {
@@ -126,6 +128,8 @@ const newRequirement = () => {
           onChange={onChangeTermino}
         />
       )}
+      <Text style={styles.subtitle}>Dirección de envio</Text>
+      <TextInput style={styles.textInput} placeholder="Dirección de envio" value={direccion} onChangeText={setDireccion} />
 			<Text
 				style={styles.title}
 			>Productos</Text>

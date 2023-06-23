@@ -8,7 +8,7 @@ const Requirement = () => {
     const { id } = useLocalSearchParams();
     const [requirement, setRequirement] = useState({});
     const router = useRouter();
-    const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'productos'];
+    const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'productos', 'direccion'];
     const [ofertas, setOfertas] = useState([]);
     const [user, setUser] = useState({});
     useEffect(() => {
@@ -95,7 +95,7 @@ const Requirement = () => {
                             {
                                 (field === 'fecha_inicio' || field === 'fecha_fin') ? formatDate(requirement[field]) :
                                 (field === 'usuario') ? requirement[field]?.nombre_usuario + ' ' + requirement[field]?.apellidos_usuario :
-                                (field === 'estado') ? requirement[field] :
+                                (field === 'estado' || field === 'direccion') ? requirement[field] :
                                 (field === 'productos') ? requirement[field]?.map((product, idx) => (
                                     <View key={idx}>
                                         <Text style={styles.text}>Nombre: {product.nombre}</Text>
@@ -109,7 +109,7 @@ const Requirement = () => {
                 ))}
             </ScrollView>
                 <ScrollView>
-                    {requirement.estado === 'activo' &&	(
+                    {requirement.estado === 'activo' && user.rol !== "Cliente externo" && (
                     <View>
                         <Text
                             style={styles.title}
@@ -165,7 +165,9 @@ const Requirement = () => {
                         >
                             <Text
                                 style={styles.fieldTitle}
-                            >Ofertar</Text>
+                            >
+                                Ofertar
+                            </Text>
                         </TouchableOpacity>
                     </View>)}
                 </ScrollView>

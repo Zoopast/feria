@@ -50,64 +50,81 @@ const Requirement = () => {
         setUser(user);
     }
 
-			const onChangeInicio = (event, selectedDate) => {
-				const currentDate = selectedDate || fechaInicio;
-				setShowInicio(Platform.OS === 'ios');
-				setFechaInicio(currentDate);
-			};
+		const onChangeInicio = (event, selectedDate) => {
+			const currentDate = selectedDate || fechaInicio;
+			setShowInicio(Platform.OS === 'ios');
+			setFechaInicio(currentDate);
+		};
 
-			const showDatepickerInicio = () => {
-				setShowInicio(true);
-			};
+		const showDatepickerInicio = () => {
+			setShowInicio(true);
+		};
 
-			const onChangeTermino = (event, selectedDate) => {
-				const currentDate = selectedDate || fechaTermino;
-				setShowTermino(Platform.OS === 'ios');
-				setFechaTermino(currentDate);
-			};
+		const onChangeTermino = (event, selectedDate) => {
+			const currentDate = selectedDate || fechaTermino;
+			setShowTermino(Platform.OS === 'ios');
+			setFechaTermino(currentDate);
+		};
 
-			const showDatepickerTermino = () => {
-				setShowTermino(true);
-			};
+		const showDatepickerTermino = () => {
+			setShowTermino(true);
+		};
 
-			const handleOffer = async () => {
-				const oferta = {
-					id_subasta: auctionInfo.subasta.id_subasta,
-					id_transportista: user.id_usuario,
-					precio: precioOferta,
-					fecha_recoleccion: formatDate(fechaInicio),
-					fecha_entrega: formatDate(fechaTermino)
-				}
-				console.log(oferta);
-				await axios.post("https://feriamaipo.herokuapp.com/subastas/ofertas/hacer_oferta", oferta).then(
-					(response) => {
-						console.log(response.data);
-						router.push("/subastas");
-					}
-				).catch((error) => {
-					console.log(error);
-				});
+		const handleOffer = async () => {
+			const oferta = {
+				id_subasta: auctionInfo.subasta.id_subasta,
+				id_transportista: user.id_usuario,
+				precio: precioOferta,
+				fecha_recoleccion: formatDate(fechaInicio),
+				fecha_entrega: formatDate(fechaTermino)
 			}
-
-
-			const showMode = (currentMode) => {
-				if (Platform.OS === 'android') {
-					setShow(true);
+			console.log(oferta);
+			await axios.post("https://feriamaipo.herokuapp.com/subastas/ofertas/hacer_oferta", oferta).then(
+				(response) => {
+					console.log(response.data);
+					router.push("/subastas");
 				}
-				setMode(currentMode);
-			};
+			).catch((error) => {
+				console.log(error);
+			});
+		}
 
-    const formatDate = (date) => {
-				if (!date) return '';
-        const dateArray = date?.split('-');
-        if(!dateArray) return '';
-        const year = dateArray[0];
-        const month = dateArray[1];
-        const dayArray = dateArray[2].split('T');
-        const day = dayArray[0];
+		const pickup_delivery = async () => {
+			await axios.post(`https://feriamaipo.herokuapp.com/subastas/actualizar/envio/recogido/?id_subasta=${id}&id_requerimiento=${auctionInfo.requerimiento?.id_requerimiento}`).then(
+				(response) => {
+					console.log(response.data);
+					router.push("/subastas/won");
+				}
+			)
+		}
 
-        return `${day}/${month}/${year}`;
-    }
+		const deliver_package = async () => {
+			await axios.post(`https://feriamaipo.herokuapp.com/subastas/actualizar/envio/entregado/?id_subasta=${id}&id_requerimiento=${auctionInfo.requerimiento?.id_requerimiento}`).then(
+				(response) => {
+					console.log(response.data);
+					router.push("/subastas/won");
+				}
+			)
+		}
+
+		const showMode = (currentMode) => {
+			if (Platform.OS === 'android') {
+				setShow(true);
+			}
+			setMode(currentMode);
+		};
+
+	const formatDate = (date) => {
+			if (!date) return '';
+			const dateArray = date?.split('-');
+			if(!dateArray) return '';
+			const year = dateArray[0];
+			const month = dateArray[1];
+			const dayArray = dateArray[2].split('T');
+			const day = dayArray[0];
+
+			return `${day}/${month}/${year}`;
+	}
 
     return(
         <View style={styles.container}>
@@ -131,8 +148,14 @@ const Requirement = () => {
 											<Text style={styles.fieldTitle}>Cantidad total: {product.cantidad}</Text>
 										</View>))}
 								</View>
+								<View>
+									<Text style={styles.title}>Dirección de envio</Text>
+									<Text style={styles.fieldTitle}>{auctionInfo.requerimiento?.direccion}</Text>
+								</View>
             </ScrollView>
-						<ScrollView>
+						{
+							auctionInfo.subasta?.estado === 'activo' &&
+							<ScrollView>
 							<Text style={styles.title}>Ofertar transporte</Text>
 							<Text style={styles.fieldTitle}>Fecha recogida</Text>
 							<TextInput style={styles.textInput} value={formatDate(fechaInicio)} />
@@ -177,11 +200,55 @@ const Requirement = () => {
 								<Text style={styles.text}>Ofertar</Text>
 							</TouchableOpacity>
 						</ScrollView>
+						}
+						{
+							auctionInfo.subasta?.estado === 'pendiente de entrega' &&
+							<TouchableOpacity style={styles.pickedButton} onPress={pickup_delivery}>
+								<Text style={styles.pickedButtonText}>Ya recogí esta orden</Text>
+							</TouchableOpacity>
+						}
+						{
+							auctionInfo.subasta?.estado === 'en camino' &&
+							<TouchableOpacity style={styles.deliveredButton} onPress={deliver_package}>
+								<Text style={styles.deliveredButtonText}>Ya entregué esta orden</Text>
+							</TouchableOpacity>
+						}
         </View>
     )
 }
 
 const styles = StyleSheet.create({
+
+	pickedButton: {
+		backgroundColor: '#282b30',
+		padding: 10,
+		marginTop: 10,
+		marginBottom: 10,
+		borderWidth: 1,
+		borderColor: 'green',
+	},
+
+	pickedButtonText: {
+		color: 'white',
+		fontSize: 15,
+		textAlign: 'center'
+	},
+
+	deliveredButton: {
+		backgroundColor: '#282b30',
+		padding: 10,
+		marginTop: 10,
+		marginBottom: 10,
+		borderWidth: 1,
+		borderColor: 'green',
+	},
+	deliveredButtonText: {
+		color: 'white',
+		fontSize: 15,
+		textAlign: 'center'
+
+	},
+
 	textInput: {
 		height: 40,
 		borderColor: 'gray',

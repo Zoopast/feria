@@ -113,7 +113,7 @@ const HomeScreen = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/requirements')}
+            onPress={() => router.push('/subastas/won')}
           >
             <Text style={{color: 'white'}}>Ver subastas ganadas</Text>
           </TouchableOpacity>
