@@ -114,6 +114,56 @@ const HomeScreen = () => {
 
       <Text style={styles.text}>Hola, {user?.nombre_usuario}</Text>
       <Text style={styles.text}>Bienvenido a Feria Maipo</Text>
+      {user?.rol === 'Consultor' && (
+        <View
+        style={{
+          gap: 20,
+          paddingHorizontal: 20,
+          marginBottom: 20,
+        }}
+        >
+          <TouchableOpacity
+            title="Ver ventas efectuadas"
+            style={styles.button}
+            onPress={() => router.push("/ventas/")}
+          >
+            <Text style={{color: 'white'}}>Ver ventas efectuadas</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            title="Ver productos comprados"
+            style={styles.button}
+            onPress={() => router.push("/ventas/")}
+          >
+            <Text style={{color: 'white'}}>Analizar compras</Text>
+          </TouchableOpacity>
+        </View>
+        )
+      }
+      {user?.rol === 'Cliente interno' && (
+        <View
+        style={{
+          gap: 20,
+          paddingHorizontal: 20,
+          marginBottom: 20,
+        }}
+        >
+          <TouchableOpacity
+            title="Ver productos en venta"
+            style={styles.button}
+            onPress={() => router.push("/ventas_locales/")}
+          >
+            <Text style={{color: 'white'}}>Ver productos en venta</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            title="Ver productos comprados"
+            style={styles.button}
+            onPress={() => router.push("/ventas_locales/mine/")}
+          >
+            <Text style={{color: 'white'}}>Ver productos comprados</Text>
+          </TouchableOpacity>
+        </View>
+        )
+      }
       {(user?.rol === 'Administrador' || user?.rol === 'Cliente externo' ) && (
       <View
         style={{
