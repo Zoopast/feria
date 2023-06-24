@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 
 import axios from 'axios';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+
 
 const Requirement = () => {
     const { id } = useLocalSearchParams();
@@ -93,6 +96,29 @@ const Requirement = () => {
         const day = dayArray[0];
 
         return `${day}/${month}/${year}`;
+    }
+
+    const printPDF = async () => {
+        const html = `
+        <h1>Requerimiento ${id}</h1>
+        <h2>Usuario: ${requirement.usuario?.nombre_usuario} ${requirement.usuario?.apellidos_usuario}</h2>
+        <h2>Estado: ${requirement.estado}</h2>
+        <h2>Fecha de inicio: ${formatDate(requirement.fecha_inicio)}</h2>
+        <h2>Fecha de fin: ${formatDate(requirement.fecha_fin)}</h2>
+        <h2>Dirección: ${requirement.direccion}</h2>
+        <h2>Productos:</h2>
+        <ul>
+            ${requirement.productos?.map((product) => (
+                `<li>
+                    <h3>Nombre: ${product.nombre}</h3>
+                    <h3>Cantidad: ${product.cantidad}</h3>
+                    <h3>Calidad: ${product.calidad}</h3>
+                </li>`
+            ))}
+        </ul>
+        `;
+        const { uri } = await Print.printToFileAsync({ html });
+        await Sharing.shareAsync(uri);
     }
 
     return(
@@ -188,6 +214,15 @@ const Requirement = () => {
                         <Text style={styles.receivedTitle}>Confirmar entrega</Text>
                         <TouchableOpacity style={styles.receivedButton} onPress={finalize}>
                             <Text style={styles.receivedButtonText}>Recibí mis productos</Text>
+                        </TouchableOpacity>
+                    </View>
+                }
+                {
+                    requirement.estado === "finalizado" &&
+                    <View>
+                        <Text style={styles.receivedTitle}>Imprimir como PDF</Text>
+                        <TouchableOpacity style={styles.receivedButton} onPress={printPDF}>
+                            <Text style={styles.receivedButtonText}>Imprimir</Text>
                         </TouchableOpacity>
                     </View>
                 }

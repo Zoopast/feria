@@ -13,6 +13,7 @@ const auctions = () => {
 	const router = useRouter();
 
 	const filterSubastas = (data, filter) => {
+		console.log(data);
 		return data.filter((subasta) => subasta.estado === filter);
 	}
 
@@ -21,7 +22,7 @@ const auctions = () => {
 			const user = JSON.parse(await AsyncStorage.getItem('@user'));
 			await axios.get(`https://feriamaipo.herokuapp.com/subastas/won/?id_transportista=${user.id_usuario}`).then(
 				(response) => {
-					setSubastasPendientes(filterSubastas(response.data, 'pendiente de entrega'))
+					setSubastasPendientes(filterSubastas(response.data, 'en preparación'))
 					setSubastasFinalizadas(filterSubastas(response.data, 'entregado'))
 					setSubastasEnCamino(filterSubastas(response.data, 'en camino'))
 					setSubastas(response.data);

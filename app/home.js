@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import axios from 'axios';
@@ -9,11 +9,70 @@ const HomeScreen = () => {
   const [user, setUser] = useState({});
   const router = useRouter();
 
+  const processUserData = async (userData) => {
+    try{
+      if (userData.rol && userData.rol.toLowerCase() === "cliente externo") {
+        console.log(userData.rol)
+        const token = await AsyncStorage.getItem('authToken');
+        await axios.get('https://feriamaipo.herokuapp.com/usuarios/me/requerimientos/entregados/', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }).then(async (response) => {
+          const requerimientosEntregados = await AsyncStorage.getItem('@requerimientosEntregados');
+
+          if (requerimientosEntregados) {
+            const alreadyNotified = requerimientosEntregados.find(requerimiento => requerimiento === response.data)
+            if (!alreadyNotified) {
+              const requerimientos_id = JSON.parse(requerimientosEntregados);
+              requerimientos_id.push(response.data);
+              await AsyncStorage.setItem('@requerimientosEntregados', JSON.stringify(requerimientos_id));
+              Alert.alert(
+                "Nuevo requerimiento entregado",
+                "Ve a tus requerimientos para ver más detalles",
+                [
+                  {
+                    text: "Ir a tus requerimientos",
+                    onPress: () => router.push("/requirements/mine"),
+                  },
+                ]
+              );
+            }
+          }
+          else{
+            const requerimientos_id = [];
+            response.data.forEach(requerimiento => {
+              requerimientos_id.push(requerimiento.id_requerimiento);
+            });
+            await AsyncStorage.setItem('@requerimientosEntregados', JSON.stringify(requerimientos_id));
+            Alert.alert(
+              "Nuevo requerimiento entregado",
+              "Ve a tus requerimientos para ver más detalles",
+              [
+                {
+                  text: "Ir a tus requerimientos",
+                  onPress: () => router.push("/requirements/mine"),
+                },
+              ]
+            );
+          }
+
+          console.log(response.data);
+        }).catch((error) => {
+          console.log(error);
+        });
+      }
+    }catch(error) {
+      console.log(error);
+    }
+  };
+
   const fetchUserData = async () => {
     try {
       const userData = await AsyncStorage.getItem('@user');
 
-      if(userData) {
+      if (userData) {
+        console.log(userData);
         setUser(JSON.parse(userData));
         return;
       }
@@ -44,6 +103,11 @@ const HomeScreen = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    processUserData(user);
+  }, [user]);
+
 
   return (
     <View style={styles.container}>

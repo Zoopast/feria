@@ -203,7 +203,7 @@ const Requirement = () => {
 						</ScrollView>
 						}
 						{
-							auctionInfo.subasta?.estado === 'pendiente de entrega' &&
+							auctionInfo.subasta?.estado === 'en preparación' &&
 							<TouchableOpacity style={styles.pickedButton} onPress={pickup_delivery}>
 								<Text style={styles.pickedButtonText}>Ya recogí esta orden</Text>
 							</TouchableOpacity>
