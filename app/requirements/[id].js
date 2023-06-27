@@ -14,6 +14,7 @@ const Requirement = () => {
     const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'productos', 'direccion'];
     const [ofertas, setOfertas] = useState([]);
     const [user, setUser] = useState({});
+    const [direccion, setDireccion] = useState('')
     useEffect(() => {
         getUser();
         getRequirement();
@@ -67,16 +68,20 @@ const Requirement = () => {
     }
 
     const filterOfertasWithNonValidValues = () => {
-        return ofertas.filter((oferta) => oferta.precio !== "0");
+        return ofertas.filter((oferta) => oferta.precio !== "0" && oferta.cantidad !== "0");
       }
 
       const createOferta = async () => {
         try {
           const validOfertas = filterOfertasWithNonValidValues();
-
+          console.log(validOfertas);
+          const productsOfertas = {
+            direccion: direccion,
+            ofertas: validOfertas,
+          }
           await axios.post(
             'https://feriamaipo.herokuapp.com/requerimientos/productos/oferta/',
-            validOfertas
+            productsOfertas
           ).then((response) => {
             if(response.status === 200) {
                 router.push('/requirements');
@@ -153,10 +158,26 @@ const Requirement = () => {
                         >
                             Ofertar
                         </Text>
+                        <View
+                            style={{
+                                marginTop: 10
+                            }}
+                        >
+                            <Text style={styles.fieldTitle}>Dirección de recogida</Text>
+                            <TextInput
+                                value={direccion}
+                                style={[{color: "white"},styles.field]}
+                                placeholder="Dirección de recogida"
+                                placeholderTextColor={'#BDBDBD'}
+                                onChangeText={text => setDireccion(text)}
+                            />
+                        </View>
                         {requirement.productos?.map((product, idx) => (
                             <View key={idx} style={styles.field}>
-                                <Text style={styles.fieldTitle}>Nombre: {product.nombre}</Text>
-                                <Text style={styles.fieldTitle}>Cantidad total: {product.cantidad}</Text>
+                                <Text style={styles.titleTwo}>Nombre</Text>
+                                <Text style={styles.fieldTitle}>{product.nombre} </Text>
+                                <Text style={styles.titleTwo}> Cantidad total </Text>
+                                <Text style={styles.fieldTitle}> {product.cantidad} </Text>
 
                                 <View
                                     style={{
@@ -198,10 +219,13 @@ const Requirement = () => {
                         ))}
                         <TouchableOpacity
                             onPress={createOferta}
-                            style={styles.field}
+                            style={[styles.offerButton, {
+                                borderColor: direccion.length === 0 ? '#BDBDBD' : 'green',
+                            }]}
+                            disabled={direccion.length === 0}
                         >
                             <Text
-                                style={styles.fieldTitle}
+                                style={styles.offerButtonText}
                             >
                                 Ofertar
                             </Text>
@@ -263,6 +287,11 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    titleTwo: {
+        fontSize: 15,
+        color: 'white',
+        fontWeight: 'bold',
+    },
     field: {
         backgroundColor: '#282b30',
         padding: 10,
@@ -275,7 +304,20 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-    }
+    },
+    offerButton: {
+        backgroundColor: '#282b30',
+        padding: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: 'green',
+    },
+    offerButtonText: {
+        color: 'white',
+        fontSize: 15,
+        textAlign: 'center'
+    },
 });
 
 export default Requirement;

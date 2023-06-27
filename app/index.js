@@ -7,13 +7,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 
 export default function Page() {
+  const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [disabled, setDisabled] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     checkIfUserIsLoggedIn();
   }, []);
+
+
 
   const saveToken = async (jwtToken) => {
     try {
@@ -56,6 +60,9 @@ export default function Page() {
           router.push('/home');
         }
       }).catch((error) => {
+        if(error.response.status === 401) {
+          setMessage('Email o contraseña incorecto');
+        }
         console.log(error);
       });
     } catch (error) {
@@ -70,6 +77,15 @@ export default function Page() {
         style={styles.title}
       >
         Iniciar sesión</Text>
+      <View>
+        <Text
+          style={{
+            color: 'white',
+          }}
+        >
+          {message}
+        </Text>
+      </View>
       <View
         style={{
           paddingHorizontal: 20,
@@ -85,7 +101,7 @@ export default function Page() {
         />
 
         <TextInput
-          placeholder="Password"
+          placeholder="Contraseña"
           value={password}
           placeholderTextColor="white"
           onChangeText={setPassword}
@@ -94,9 +110,13 @@ export default function Page() {
         />
       </View>
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, {
+          backgroundColor: email.length > 0 && password.length > 0 ? 'green' : 'gray',
+        }]}
         title="Login"
-        onPress={handleLogin}>
+        onPress={handleLogin}
+        disabled={email.length > 0 && password.length > 0 ? false : true}
+      >
         <Text
           style={{
             color: 'white',
@@ -150,7 +170,6 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: "center",
-    backgroundColor: "green",
     color: "white",
     padding: 10,
     borderRadius: 8,

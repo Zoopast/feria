@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 		gap: 10,
 		borderRadius: 10,
+		maxHeight: 100,
 	},
 	field: {
 		flex: 1,
