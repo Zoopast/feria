@@ -145,6 +145,7 @@ const Requirement = () => {
 										<View key={idx} style={styles.field}>
 											<Text style={styles.fieldTitle}>Nombre: {product.nombre}</Text>
 											<Text style={styles.fieldTitle}>Cantidad total: {product.cantidad}</Text>
+											<Text style={styles.fieldTitle}>Direcciones recogida: {product.direcciones}</Text>
 										</View>))}
 								</View>
 								<View>
@@ -198,7 +199,7 @@ const Requirement = () => {
 								onChangeText={setPrecioOferta}
 							/>
 							<TouchableOpacity style={styles.ofertarButton} onPress={handleOffer}>
-								<Text style={styles.text}>Ofertar</Text>
+								<Text style={styles.ofertarButtonText}>Ofertar</Text>
 							</TouchableOpacity>
 						</ScrollView>
 						}
@@ -264,6 +265,8 @@ const styles = StyleSheet.create({
 			padding: 10,
 			marginTop: 10,
 			marginBottom: 10,
+			borderWidth: 1,
+			borderColor: 'green',
 		},
     container: {
         flex: 1,
@@ -288,7 +291,12 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-    }
+    },
+		ofertarButtonText: {
+			color: 'white',
+			fontSize: 15,
+			textAlign: 'center'
+		}
 });
 
 export default Requirement;

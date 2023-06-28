@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#1e2124',
 		padding: 10,
 		gap: 10,
+		maxHeight: 120,
 	},
 	requirement: {
 		flex: 1,

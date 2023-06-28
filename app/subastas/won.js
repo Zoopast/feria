@@ -357,6 +357,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 		gap: 10,
 		borderRadius: 10,
+		maxHeight: 120,
 	},
 	field: {
 		flex: 1,

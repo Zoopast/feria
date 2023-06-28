@@ -12,21 +12,31 @@ const HomeScreen = () => {
   const processUserData = async (userData) => {
     try{
       if (userData.rol && userData.rol.toLowerCase() === "cliente externo") {
-        console.log(userData.rol)
         const token = await AsyncStorage.getItem('authToken');
         await axios.get('https://feriamaipo.herokuapp.com/usuarios/me/requerimientos/entregados/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }).then(async (response) => {
-          const requerimientosEntregados = await AsyncStorage.getItem('@requerimientosEntregados');
-
+          let requerimientosEntregados = await AsyncStorage.getItem('@requerimientosEntregados');
           if (requerimientosEntregados) {
-            const alreadyNotified = requerimientosEntregados.find(requerimiento => requerimiento === response.data)
-            if (!alreadyNotified) {
-              const requerimientos_id = JSON.parse(requerimientosEntregados);
-              requerimientos_id.push(response.data);
-              await AsyncStorage.setItem('@requerimientosEntregados', JSON.stringify(requerimientos_id));
+            requerimientosEntregados = JSON.parse(requerimientosEntregados);
+            console.log(requerimientosEntregados)
+            let notify = false;
+            response.data.forEach((data) => {
+              data.forEach((product_delivered) => {
+                if(!requerimientosEntregados[product_delivered] && !notify) {
+                  notify = true;
+                  requerimientosEntregados[product_delivered] = true
+                }
+                else if(!requerimientosEntregados[product_delivered]) {
+                  requerimientosEntregados[product_delivered] = true
+                }
+              })
+            });
+
+            if (notify) {
+              await AsyncStorage.setItem('@requerimientosEntregados', JSON.stringify(requerimientosEntregados));
               Alert.alert(
                 "Nuevo requerimiento entregado",
                 "Ve a tus requerimientos para ver más detalles",
@@ -40,9 +50,9 @@ const HomeScreen = () => {
             }
           }
           else{
-            const requerimientos_id = [];
+            const requerimientos_id = {};
             response.data.forEach(requerimiento => {
-              requerimientos_id.push(requerimiento.id_requerimiento);
+              requerimientos_id[requerimiento] = true;
             });
             await AsyncStorage.setItem('@requerimientosEntregados', JSON.stringify(requerimientos_id));
             Alert.alert(
@@ -56,8 +66,6 @@ const HomeScreen = () => {
               ]
             );
           }
-
-          console.log(response.data);
         }).catch((error) => {
           console.log(error);
         });
@@ -72,7 +80,6 @@ const HomeScreen = () => {
       const userData = await AsyncStorage.getItem('@user');
 
       if (userData) {
-        console.log(userData);
         setUser(JSON.parse(userData));
         return;
       }
