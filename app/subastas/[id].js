@@ -139,13 +139,31 @@ const Requirement = () => {
 								<Text style={styles.text}> { formatDate(new Date(auctionInfo.subasta?.fecha_fin)) } </Text>
 								<Text style={styles.fieldTitle}>Estado subasta</Text>
 								<Text style={styles.text}> { auctionInfo.subasta?.estado } </Text>
-								<Text style={styles.fieldTitle}>Produtos</Text>
+								<Text style={styles.fieldTitle}>Productos</Text>
 								<View>
 									{ auctionInfo.requerimiento?.productos?.map((product, idx) => (
 										<View key={idx} style={styles.field}>
-											<Text style={styles.fieldTitle}>Nombre: {product.nombre}</Text>
-											<Text style={styles.fieldTitle}>Cantidad total: {product.cantidad}</Text>
-											<Text style={styles.fieldTitle}>Direcciones recogida: {product.direcciones}</Text>
+											<Text style={styles.fieldTitle}>
+												<Text
+													style={styles.productTitle}
+												>
+													Nombre:
+												</Text> {product.nombre}
+											</Text>
+											<Text style={styles.fieldTitle}>
+												<Text
+													style={styles.productTitle}
+												>
+													Cantidad total:
+												</Text> {product.cantidad}
+											</Text>
+											<Text style={styles.fieldTitle}>
+												<Text
+													style={styles.productTitle}
+												>
+													Direcciones recogida:
+												</Text> {product.direcciones}
+											</Text>
 										</View>))}
 								</View>
 								<View>
@@ -221,6 +239,10 @@ const Requirement = () => {
 
 const styles = StyleSheet.create({
 
+	productTitle: {
+		fontWeight: 'bold',
+		color: 'white'
+	},
 	pickedButton: {
 		backgroundColor: '#282b30',
 		padding: 10,
