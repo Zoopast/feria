@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const requirements = () => {
 	const [user, setUser] = useState({});
 	const [requirements, setRequirements] = useState([]);
-	const estados = ['activo', 'en subasta', 'en camino', 'finalizado'];
+	const estados = ['enviado','activo', 'en subasta', 'en camino', 'finalizado'];
 	const router = useRouter();
 
 	const getActiveRequirements = async () => {

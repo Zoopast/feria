@@ -67,6 +67,19 @@ const Requirement = () => {
         return productsOfertas;
     }
 
+    const formatNumber = (number) =>
+    {
+        if(number === undefined) return number;
+        //format string to int
+
+        if(number < 1000) return number;
+
+        // add . every 3 digits
+        number = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        return number + " unidades";
+    }
+
     const filterOfertasWithNonValidValues = () => {
         return ofertas.filter((oferta) => oferta.precio !== "0" && oferta.cantidad !== "0");
       }
@@ -139,10 +152,16 @@ const Requirement = () => {
                                 (field === 'usuario') ? requirement[field]?.nombre_usuario + ' ' + requirement[field]?.apellidos_usuario :
                                 (field === 'estado' || field === 'direccion') ? requirement[field] :
                                 (field === 'productos') ? requirement[field]?.map((product, idx) => (
-                                    <View key={idx}>
-                                        <Text style={styles.text}>Nombre: {product.nombre}</Text>
-                                        <Text style={styles.text}>Cantidad: {product.cantidad}</Text>
-                                        <Text style={styles.text}>Calidad: {product.calidad}</Text>
+                                    <View style={styles.product} key={idx}>
+                                        <Text >
+                                            <Text style={styles.productFieldTitle}>Nombre:</Text> <Text style={styles.productField}>{product.nombre}</Text>
+                                        </Text>
+                                        <Text >
+                                            <Text style={styles.productFieldTitle}>Cantidad:</Text> <Text style={styles.productField}>{formatNumber(product.cantidad)}</Text>
+                                        </Text>
+                                        <Text >
+                                            <Text style={styles.productFieldTitle}>Calidad:</Text> <Text style={styles.productField}>{product.calidad}</Text>
+                                        </Text>
                                     </View>
                                 )) : null
                             }
@@ -255,6 +274,21 @@ const Requirement = () => {
 }
 
 const styles = StyleSheet.create({
+    productFieldTitle: {
+        fontWeight: 'bold',
+    },
+    productField: {
+        fontWeight: 'normal',
+        color: '#DCDCDC',
+    },
+    product: {
+        flex: 1,
+        flexDirection: 'column',
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 10,
+        marginBottom: 10,
+    },
     receivedTitle: {
         fontSize: 20,
         color: 'white',
@@ -303,7 +337,7 @@ const styles = StyleSheet.create({
         color: '#BDBDBD',
     },
     text: {
-        color: 'white',
+        color: 'white'
     },
     offerButton: {
         backgroundColor: '#282b30',

@@ -80,7 +80,7 @@ const newRequirement = () => {
 				}
 			).then((response) => {
 				if(response.status === 200) {
-					router.push('/requirements')
+					router.push('/requirements/mine')
 				}
 			}
 			).catch((error) => {
