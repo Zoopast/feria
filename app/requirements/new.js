@@ -256,8 +256,11 @@ const newRequirement = () => {
       ))}
     </ScrollView>
 			<TouchableOpacity
-				style={styles.submitButton}
+				style={[styles.submitButton, {
+          backgroundColor: direccion.length < 1 ? 'gray' : 'green'
+        }]}
 				onPress={sendRequirement}
+        disabled={direccion.length < 1}
 			>
 				<Text
 					style={styles.submitButtonText}
