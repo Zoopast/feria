@@ -182,7 +182,7 @@ const HomeScreen = () => {
         <TouchableOpacity
           title="Nuevo requerimiento"
           style={styles.button}
-          onPress={() => router.push("/new_requirement") }
+          onPress={() => router.push("/requirements/new") }
         >
           <Text style={{color: 'white'}}>Nuevo requerimiento</Text>
         </TouchableOpacity>
