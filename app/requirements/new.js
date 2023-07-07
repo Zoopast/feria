@@ -72,6 +72,8 @@ const newRequirement = () => {
   };
 
   const allProductosValid = () => {
+    if (productos.length < 1) return false;
+
     let valid = true;
 
     productos.forEach((producto) => {
