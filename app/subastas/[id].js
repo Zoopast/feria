@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -24,22 +24,27 @@ const Requirement = () => {
 		const [fechaTermino, setFechaTermino] = useState(new Date());
 		const [showInicio, setShowInicio] = useState(false);
 		const [showTermino, setShowTermino] = useState(false);
+		const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
 			const get_auction_info = async () => {
-				await axios.get(`https://feriamaipo.herokuapp.com/subastas/${id}/info/`).then((response) => {
-					setAuctionInfo(response.data);
-					console.log(response.data);
-				}
-
-				).catch((error) => {
+				try {
+					setLoading(true);
+					await axios.get(`https://feriamaipo.herokuapp.com/subastas/${id}/info/`).then((response) => {
+						setAuctionInfo(response.data);
+						setLoading(false);
+					}
+					).catch((error) => {
+						console.log(error);
+						});
+				}catch (error) {
 					console.log(error);
-					});
+				}
 			}
 
 			get_auction_info();
-
-        getUser();
+      getUser();
     }, []);
 
 
@@ -137,7 +142,11 @@ const Requirement = () => {
     return(
         <View style={styles.container}>
             <Text style={styles.title}>Subasta {id}</Text>
-            <ScrollView>
+						{loading ?
+							<ActivityIndicator size="large" color="green" />
+						: (
+							<View>
+								<ScrollView>
 								<Text style={styles.fieldTitle}>Requerimiento</Text>
 								<Text style={styles.text}> { auctionInfo.requerimiento?.id_requerimiento }  </Text>
 								<Text style={styles.fieldTitle}>Usuario</Text>
@@ -246,6 +255,8 @@ const Requirement = () => {
 								<Text style={styles.deliveredButtonText}>Ya entregué esta orden</Text>
 							</TouchableOpacity>
 						}
+							</View>
+						)}
         </View>
     )
 }
