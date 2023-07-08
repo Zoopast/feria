@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
+const OFERTA_API_URL = 'https://feriamaipo.herokuapp.com/requerimientos/productos/oferta/'
 
 const Requirement = () => {
     const { id } = useLocalSearchParams();
@@ -15,7 +16,8 @@ const Requirement = () => {
     const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'productos', 'direccion'];
     const [ofertas, setOfertas] = useState([]);
     const [user, setUser] = useState({});
-    const [direccion, setDireccion] = useState('')
+    const [direccion, setDireccion] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const allOffersAreValid = () => {
         if(ofertas.length < 1) return false;
@@ -85,12 +87,16 @@ const Requirement = () => {
         return productsOfertas;
     }
 
-    const validateNumber = (text) => {
+    const validateNumber = (text, maxQty = 0) => {
         // Remove leading zeros
         const numericText = text.replace(/^0+(0$|[^0])/, '$1');
         // Ensure quantity is greater than 1
         const quantity = parseInt(numericText, 10);
-        const validQuantity = isNaN(quantity) || quantity < 1 ? 1 : quantity;
+        if(maxQty === 0){
+            const validQuantity = isNaN(quantity) || quantity < 1 ? 1 : quantity;
+            return validQuantity;
+        }
+        const validQuantity = isNaN(quantity) || quantity < 1 ? 1 : Math.min(quantity, maxQty);
         return validQuantity;
     }
 
@@ -113,6 +119,7 @@ const Requirement = () => {
 
       const createOferta = async () => {
         try {
+          setLoading(true);
           const validOfertas = filterOfertasWithNonValidValues();
           console.log(validOfertas);
           const productsOfertas = {
@@ -120,7 +127,7 @@ const Requirement = () => {
             ofertas: validOfertas,
           }
           await axios.post(
-            'https://feriamaipo.herokuapp.com/requerimientos/productos/oferta/',
+            OFERTA_API_URL,
             productsOfertas
           ).then((response) => {
             if(response.status === 200) {
@@ -129,6 +136,8 @@ const Requirement = () => {
           });
         } catch (e) {
           console.log(e);
+        } finally {
+            setLoading(false);
         }
       }
 
@@ -238,7 +247,7 @@ const Requirement = () => {
                                         keyboardType="numeric"
                                         placeholderTextColor={'#BDBDBD'}
                                         onChangeText={text => {
-                                            const validNumber = validateNumber(text);
+                                            const validNumber = validateNumber(text, product.cantidad);
                                             const newOfertas = [...ofertas];
                                             newOfertas[idx].cantidad = validNumber;
                                             setOfertas(newOfertas);
@@ -274,11 +283,14 @@ const Requirement = () => {
                             }]}
                             disabled={!isOfferValid}
                         >
-                            <Text
-                                style={styles.offerButtonText}
-                            >
-                                Ofertar
-                            </Text>
+                            { !loading ?
+                                <Text
+                                    style={styles.offerButtonText}
+                                >
+                                    Ofertar
+                                </Text> :
+                                <ActivityIndicator size="small" color="#00ff00" />
+                            }
                         </TouchableOpacity>
                     </View>)}
                 </ScrollView>
