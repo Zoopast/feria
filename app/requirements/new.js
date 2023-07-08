@@ -86,7 +86,6 @@ const newRequirement = () => {
   };
 
   useEffect(() => {
-    console.log(allProductosValid() && direccion.length > 0)
     setIsButtonEnabled(allProductosValid() && direccion.length > 0);
   }, [productos, direccion]);
 
@@ -132,6 +131,15 @@ const newRequirement = () => {
 			console.log(error);
 		}
 	}
+
+  const validateNumber = (text) => {
+    // Remove leading zeros
+    const numericText = text.replace(/^0+(0$|[^0])/, '$1');
+    // Ensure quantity is greater than 1
+    const quantity = parseInt(numericText, 10);
+    const validQuantity = isNaN(quantity) || quantity < 1 ? 1 : quantity;
+    return validQuantity;
+  }
 
 	return (
 		<View
@@ -279,13 +287,9 @@ const newRequirement = () => {
               placeholder="Cantidad"
               value={producto.cantidad.toString()}
               onChangeText={text => {
-                // Remove leading zeros
-                const numericText = text.replace(/^0+(0$|[^0])/, '$1');
-                // Ensure quantity is greater than 1
-                const quantity = parseInt(numericText, 10);
-                const validQuantity = isNaN(quantity) || quantity < 1 ? 1 : quantity;
+                const validNumber = validateNumber(text);
                 const newProductos = [...productos];
-                newProductos[index].cantidad = validQuantity;
+                newProductos[index].cantidad = validNumber;
                 setProductos(newProductos);
               }}
               keyboardType="numeric"

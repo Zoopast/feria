@@ -101,6 +101,15 @@ const Requirement = () => {
 			)
 		}
 
+		const validateNumber = (text) => {
+			// Remove leading zeros
+			const numericText = text.replace(/^0+(0$|[^0])/, '$1');
+			// Ensure quantity is greater than 1
+			const quantity = parseInt(numericText, 10);
+			const validQuantity = isNaN(quantity) || quantity < 1 ? 1 : quantity;
+			return validQuantity;
+		}
+
 		const deliver_package = async () => {
 			await axios.post(`https://feriamaipo.herokuapp.com/subastas/actualizar/envio/entregado/?id_subasta=${id}&id_requerimiento=${auctionInfo.requerimiento?.id_requerimiento}`).then(
 				(response) => {
@@ -214,7 +223,11 @@ const Requirement = () => {
 								placeholder="Precio de transporte"
 								placeholderTextColor="white"
 								value={precioOferta}
-								onChangeText={setPrecioOferta}
+								keyboardType="numeric"
+								onChangeText={text => {
+									const validNumber = validateNumber(text)
+									setPrecioOferta(validNumber);
+								}}
 							/>
 							<TouchableOpacity style={styles.ofertarButton} onPress={handleOffer}>
 								<Text style={styles.ofertarButtonText}>Ofertar</Text>

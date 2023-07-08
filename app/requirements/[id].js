@@ -10,11 +10,25 @@ import * as Sharing from 'expo-sharing';
 const Requirement = () => {
     const { id } = useLocalSearchParams();
     const [requirement, setRequirement] = useState({});
+    const [isOfferValid, setIsOfferValid] = useState(false);
     const router = useRouter();
     const fields = ['usuario', 'estado', 'fecha_inicio', 'fecha_fin', 'productos', 'direccion'];
     const [ofertas, setOfertas] = useState([]);
     const [user, setUser] = useState({});
     const [direccion, setDireccion] = useState('')
+
+    const allOffersAreValid = () => {
+        if(ofertas.length < 1) return false;
+
+        let valid = true;
+
+        ofertas.forEach(oferta => {
+            if(oferta.cantidad < 0 || oferta.precio <= 0) valid = false;
+        })
+
+        return valid;
+    }
+
     useEffect(() => {
         getUser();
         getRequirement();
@@ -23,6 +37,10 @@ const Requirement = () => {
     useEffect(() => {
         fillProductsOfertas();
     }, [requirement]);
+
+    useEffect(() => {
+        setIsOfferValid(allOffersAreValid() && direccion.length > 0);
+    }, [ofertas, direccion]);
 
     const getUser = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('@user'));
@@ -65,6 +83,15 @@ const Requirement = () => {
         setOfertas(productsOfertas);
         console.log(productsOfertas)
         return productsOfertas;
+    }
+
+    const validateNumber = (text) => {
+        // Remove leading zeros
+        const numericText = text.replace(/^0+(0$|[^0])/, '$1');
+        // Ensure quantity is greater than 1
+        const quantity = parseInt(numericText, 10);
+        const validQuantity = isNaN(quantity) || quantity < 1 ? 1 : quantity;
+        return validQuantity;
     }
 
     const formatNumber = (number) =>
@@ -208,10 +235,12 @@ const Requirement = () => {
                                         value={ofertas[idx]?.cantidad.toString()}
                                         style={[{color: "white"},styles.field]}
                                         placeholder="Cantidad a ofertar"
+                                        keyboardType="numeric"
                                         placeholderTextColor={'#BDBDBD'}
                                         onChangeText={text => {
+                                            const validNumber = validateNumber(text);
                                             const newOfertas = [...ofertas];
-                                            newOfertas[idx].cantidad = text;
+                                            newOfertas[idx].cantidad = validNumber;
                                             setOfertas(newOfertas);
                                         }}
                                     />
@@ -226,10 +255,12 @@ const Requirement = () => {
                                         value={ofertas[idx]?.precio.toString()}
                                         style={[{color: "white"},styles.field]}
                                         placeholder="Precio"
+                                        keyboardType="numeric"
                                         placeholderTextColor={'#BDBDBD'}
                                         onChangeText={text => {
+                                            const validNumber = validateNumber(text);
                                             const newOfertas = [...ofertas];
-                                            newOfertas[idx].precio = text;
+                                            newOfertas[idx].precio = validNumber;
                                             setOfertas(newOfertas);
                                         }}
                                     />
@@ -239,9 +270,9 @@ const Requirement = () => {
                         <TouchableOpacity
                             onPress={createOferta}
                             style={[styles.offerButton, {
-                                borderColor: direccion.length === 0 ? '#BDBDBD' : 'green',
+                                borderColor: !isOfferValid ? '#BDBDBD' : 'green',
                             }]}
-                            disabled={direccion.length === 0}
+                            disabled={!isOfferValid}
                         >
                             <Text
                                 style={styles.offerButtonText}
