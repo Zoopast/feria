@@ -18,6 +18,7 @@ const Requirement = () => {
     const [user, setUser] = useState({});
     const [direccion, setDireccion] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loadingInfo, setLoadingInfo] = useState(false);
 
     const allOffersAreValid = () => {
         if(ofertas.length < 1) return false;
@@ -53,8 +54,10 @@ const Requirement = () => {
 
     const getRequirement = async () => {
         try{
+            setLoadingInfo(true);
             const response = await axios.get(`https://feriamaipo.herokuapp.com/requerimientos/${id}`);
             setRequirement(response.data);
+            setLoadingInfo(false);
         }catch(error) {
             console.log(error);
         }
@@ -153,165 +156,177 @@ const Requirement = () => {
     }
 
     const printPDF = async () => {
-        const html = `
-        <h1>Requerimiento ${id}</h1>
-        <h2>Usuario: ${requirement.usuario?.nombre_usuario} ${requirement.usuario?.apellidos_usuario}</h2>
-        <h2>Estado: ${requirement.estado}</h2>
-        <h2>Fecha de inicio: ${formatDate(requirement.fecha_inicio)}</h2>
-        <h2>Fecha de fin: ${formatDate(requirement.fecha_fin)}</h2>
-        <h2>Dirección: ${requirement.direccion}</h2>
-        <h2>Productos:</h2>
-        <ul>
-            ${requirement.productos?.map((product) => (
-                `<li>
-                    <h3>Nombre: ${product.nombre}</h3>
-                    <h3>Cantidad: ${product.cantidad}</h3>
-                    <h3>Calidad: ${product.calidad}</h3>
-                </li>`
-            ))}
-        </ul>
-        `;
-        const { uri } = await Print.printToFileAsync({ html });
-        await Sharing.shareAsync(uri);
+        try {
+            const html = `
+            <h1>Requerimiento ${id}</h1>
+            <h2>Usuario: ${requirement.usuario?.nombre_usuario} ${requirement.usuario?.apellidos_usuario}</h2>
+            <h2>Estado: ${requirement.estado}</h2>
+            <h2>Fecha de inicio: ${formatDate(requirement.fecha_inicio)}</h2>
+            <h2>Fecha de fin: ${formatDate(requirement.fecha_fin)}</h2>
+            <h2>Dirección: ${requirement.direccion}</h2>
+            <h2>Productos:</h2>
+            <ul>
+                ${requirement.productos?.map((product) => (
+                    `<li>
+                        <h3>Nombre: ${product.nombre}</h3>
+                        <h3>Cantidad: ${product.cantidad}</h3>
+                        <h3>Calidad: ${product.calidad}</h3>
+                    </li>`
+                ))}
+            </ul>
+            `;
+            const { uri } = await Print.printToFileAsync({ html });
+            await Sharing.shareAsync(uri);
+        }catch (e) {
+            console.error(e);
+        }
     }
 
     return(
         <View style={styles.container}>
             <Text style={styles.title}>Requerimiento {id}</Text>
-            <ScrollView>
-                {fields.map((field) => (
-                    <View key={field} style={styles.field}>
-                        <Text style={styles.fieldTitle}>{field}</Text>
-                        <Text style={styles.text}>
-                            {
-                                (field === 'fecha_inicio' || field === 'fecha_fin') ? formatDate(requirement[field]) :
-                                (field === 'usuario') ? requirement[field]?.nombre_usuario + ' ' + requirement[field]?.apellidos_usuario :
-                                (field === 'estado' || field === 'direccion') ? requirement[field] :
-                                (field === 'productos') ? requirement[field]?.map((product, idx) => (
-                                    <View style={styles.product} key={idx}>
-                                        <Text >
-                                            <Text style={styles.productFieldTitle}>Nombre:</Text> <Text style={styles.productField}>{product.nombre}</Text>
-                                        </Text>
-                                        <Text >
-                                            <Text style={styles.productFieldTitle}>Cantidad:</Text> <Text style={styles.productField}>{formatNumber(product.cantidad)}</Text>
-                                        </Text>
-                                        <Text >
-                                            <Text style={styles.productFieldTitle}>Calidad:</Text> <Text style={styles.productField}>{product.calidad}</Text>
-                                        </Text>
-                                    </View>
-                                )) : null
-                            }
-                        </Text>
-                    </View>
-                ))}
-            </ScrollView>
-                <ScrollView>
-                    {requirement.estado === 'activo' && user.rol !== "Cliente externo" && (
+            {
+                loadingInfo ?
+                <ActivityIndicator color="green" size="large" /> :
+                (
                     <View>
-                        <Text
-                            style={styles.title}
-                        >
-                            Ofertar
-                        </Text>
-                        <View
-                            style={{
-                                marginTop: 10
-                            }}
-                        >
-                            <Text style={styles.fieldTitle}>Dirección de recogida</Text>
-                            <TextInput
-                                value={direccion}
-                                style={[{color: "white"},styles.field]}
-                                placeholder="Dirección de recogida"
-                                placeholderTextColor={'#BDBDBD'}
-                                onChangeText={text => setDireccion(text)}
-                            />
+                        <ScrollView>
+                    {fields.map((field) => (
+                        <View key={field} style={styles.field}>
+                            <Text style={styles.fieldTitle}>{field}</Text>
+                            <Text style={styles.text}>
+                                {
+                                    (field === 'fecha_inicio' || field === 'fecha_fin') ? formatDate(requirement[field]) :
+                                    (field === 'usuario') ? requirement[field]?.nombre_usuario + ' ' + requirement[field]?.apellidos_usuario :
+                                    (field === 'estado' || field === 'direccion') ? requirement[field] :
+                                    (field === 'productos') ? requirement[field]?.map((product, idx) => (
+                                        <View style={styles.product} key={idx}>
+                                            <Text >
+                                                <Text style={styles.productFieldTitle}>Nombre:</Text> <Text style={styles.productField}>{product.nombre}</Text>
+                                            </Text>
+                                            <Text >
+                                                <Text style={styles.productFieldTitle}>Cantidad:</Text> <Text style={styles.productField}>{formatNumber(product.cantidad)}</Text>
+                                            </Text>
+                                            <Text >
+                                                <Text style={styles.productFieldTitle}>Calidad:</Text> <Text style={styles.productField}>{product.calidad}</Text>
+                                            </Text>
+                                        </View>
+                                    )) : null
+                                }
+                            </Text>
                         </View>
-                        {requirement.productos?.map((product, idx) => (
-                            <View key={idx} style={styles.field}>
-                                <Text style={styles.titleTwo}>Nombre</Text>
-                                <Text style={styles.fieldTitle}>{product.nombre} </Text>
-                                <Text style={styles.titleTwo}> Cantidad total </Text>
-                                <Text style={styles.fieldTitle}> {product.cantidad} </Text>
-
-                                <View
-                                    style={{
-                                        marginTop: 10
-                                    }}
-                                >
-                                    <Text style={styles.fieldTitle}> Cantidad a ofertar </Text>
-                                    <TextInput
-                                        value={ofertas[idx]?.cantidad.toString()}
-                                        style={[{color: "white"},styles.field]}
-                                        placeholder="Cantidad a ofertar"
-                                        keyboardType="numeric"
-                                        placeholderTextColor={'#BDBDBD'}
-                                        onChangeText={text => {
-                                            const validNumber = validateNumber(text, product.cantidad);
-                                            const newOfertas = [...ofertas];
-                                            newOfertas[idx].cantidad = validNumber;
-                                            setOfertas(newOfertas);
-                                        }}
-                                    />
-                                </View>
-                                <View
-                                    style={{
-                                        marginTop: 10
-                                    }}
-                                >
-                                    <Text style={styles.fieldTitle}>Precio</Text>
-                                    <TextInput
-                                        value={ofertas[idx]?.precio.toString()}
-                                        style={[{color: "white"},styles.field]}
-                                        placeholder="Precio"
-                                        keyboardType="numeric"
-                                        placeholderTextColor={'#BDBDBD'}
-                                        onChangeText={text => {
-                                            const validNumber = validateNumber(text);
-                                            const newOfertas = [...ofertas];
-                                            newOfertas[idx].precio = validNumber;
-                                            setOfertas(newOfertas);
-                                        }}
-                                    />
-                                </View>
-                            </View>
-                        ))}
-                        <TouchableOpacity
-                            onPress={createOferta}
-                            style={[styles.offerButton, {
-                                borderColor: !isOfferValid ? '#BDBDBD' : 'green',
-                            }]}
-                            disabled={!isOfferValid}
-                        >
-                            { !loading ?
-                                <Text
-                                    style={styles.offerButtonText}
-                                >
-                                    Ofertar
-                                </Text> :
-                                <ActivityIndicator size="small" color="#00ff00" />
-                            }
-                        </TouchableOpacity>
-                    </View>)}
+                    ))}
                 </ScrollView>
-                {
-                    requirement.estado === "entregado" &&
-                    <View>
-                        <Text style={styles.receivedTitle}>Confirmar entrega</Text>
-                        <TouchableOpacity style={styles.receivedButton} onPress={finalize}>
-                            <Text style={styles.receivedButtonText}>Recibí mis productos</Text>
-                        </TouchableOpacity>
+                    <ScrollView>
+                        {requirement.estado === 'activo' && user.rol !== "Cliente externo" && (
+                        <View>
+                            <Text
+                                style={styles.title}
+                            >
+                                Ofertar
+                            </Text>
+                            <View
+                                style={{
+                                    marginTop: 10
+                                }}
+                            >
+                                <Text style={styles.fieldTitle}>Dirección de recogida</Text>
+                                <TextInput
+                                    value={direccion}
+                                    style={[{color: "white"},styles.field]}
+                                    placeholder="Dirección de recogida"
+                                    placeholderTextColor={'#BDBDBD'}
+                                    onChangeText={text => setDireccion(text)}
+                                />
+                            </View>
+                            {requirement.productos?.map((product, idx) => (
+                                <View key={idx} style={styles.field}>
+                                    <Text style={styles.titleTwo}>Nombre</Text>
+                                    <Text style={styles.fieldTitle}>{product.nombre} </Text>
+                                    <Text style={styles.titleTwo}> Cantidad total </Text>
+                                    <Text style={styles.fieldTitle}> {product.cantidad} </Text>
+
+                                    <View
+                                        style={{
+                                            marginTop: 10
+                                        }}
+                                    >
+                                        <Text style={styles.fieldTitle}> Cantidad a ofertar </Text>
+                                        <TextInput
+                                            value={ofertas[idx]?.cantidad.toString()}
+                                            style={[{color: "white"},styles.field]}
+                                            placeholder="Cantidad a ofertar"
+                                            keyboardType="numeric"
+                                            placeholderTextColor={'#BDBDBD'}
+                                            onChangeText={text => {
+                                                const validNumber = validateNumber(text, product.cantidad);
+                                                const newOfertas = [...ofertas];
+                                                newOfertas[idx].cantidad = validNumber;
+                                                setOfertas(newOfertas);
+                                            }}
+                                        />
+                                    </View>
+                                    <View
+                                        style={{
+                                            marginTop: 10
+                                        }}
+                                    >
+                                        <Text style={styles.fieldTitle}>Precio</Text>
+                                        <TextInput
+                                            value={ofertas[idx]?.precio.toString()}
+                                            style={[{color: "white"},styles.field]}
+                                            placeholder="Precio"
+                                            keyboardType="numeric"
+                                            placeholderTextColor={'#BDBDBD'}
+                                            onChangeText={text => {
+                                                const validNumber = validateNumber(text);
+                                                const newOfertas = [...ofertas];
+                                                newOfertas[idx].precio = validNumber;
+                                                setOfertas(newOfertas);
+                                            }}
+                                        />
+                                    </View>
+                                </View>
+                            ))}
+                            <TouchableOpacity
+                                onPress={createOferta}
+                                style={[styles.offerButton, {
+                                    borderColor: !isOfferValid ? '#BDBDBD' : 'green',
+                                }]}
+                                disabled={!isOfferValid}
+                            >
+                                { !loading ?
+                                    <Text
+                                        style={styles.offerButtonText}
+                                    >
+                                        Ofertar
+                                    </Text> :
+                                    <ActivityIndicator size="small" color="#00ff00" />
+                                }
+                            </TouchableOpacity>
+                        </View>)}
+                    </ScrollView>
+                    {
+                        requirement.estado === "entregado" &&
+                        <View>
+                            <Text style={styles.receivedTitle}>Confirmar entrega</Text>
+                            <TouchableOpacity style={styles.receivedButton} onPress={finalize}>
+                                <Text style={styles.receivedButtonText}>Recibí mis productos</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    {
+                        requirement.estado === "finalizado" &&
+                        <View>
+                            <Text style={styles.receivedTitle}>Imprimir como PDF</Text>
+                            <TouchableOpacity style={styles.receivedButton} onPress={printPDF}>
+                                <Text style={styles.receivedButtonText}>Imprimir</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
                     </View>
-                }
-                {
-                    requirement.estado === "finalizado" &&
-                    <View>
-                        <Text style={styles.receivedTitle}>Imprimir como PDF</Text>
-                        <TouchableOpacity style={styles.receivedButton} onPress={printPDF}>
-                            <Text style={styles.receivedButtonText}>Imprimir</Text>
-                        </TouchableOpacity>
-                    </View>
-                }
+                )
+            }
         </View>
     )
 }
