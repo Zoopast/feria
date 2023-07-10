@@ -74,9 +74,21 @@ export default function Page() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Text
+        style={{
+          fontSize: 30,
+          fontWeight: 'bold',
+          marginBottom: 20,
+          color: 'white',
+
+        }}
+      >
+        Feria Maipo
+      </Text>
+      <Text
         style={styles.title}
       >
-        Iniciar sesión</Text>
+        Iniciar sesión
+      </Text>
       <View>
         <Text
           style={{
