@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,17 +7,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const my_requirements = () => {
   const [user, setUser] = useState({});
   const [requirements, setRequirements] = useState([]);
+  const [loading, setLoading] = useState(false);
   const estados = ['enviado','activo', 'en subasta', 'en camino', 'entregado', 'finalizado'];
   const router = useRouter();
 
   const getActiveRequirements = async () => {
     try {
+      setLoading(true);
       const token = await AsyncStorage.getItem('authToken');
       if (!token) return;
       await axios.get('https://feriamaipo.herokuapp.com/requerimientos/activos/', {
       })
         .then((response) => {
           setRequirements(response.data);
+          setLoading(false);
         })
         .catch((error) => {
           console.log(error);
@@ -86,45 +89,52 @@ const my_requirements = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>
-        {user?.rol === 'Cliente externo' && "Mis requerimientos"}
-        {user?.rol === 'Productor' && "Requerimientos activos"}
-      </Text>
-      <View style={styles.requirements}>
-        {requirements.length === 0 && <Text style={styles.text}>No hay requerimientos</Text>}
-        {estados.map((estado) => (
-          <View key={estado} style={styles.statusContainer}>
-            <Text style={styles.statusText}>Requerimientos {estado}</Text>
-            {filterRequirements(estado).map((requirement) => (
-              <TouchableOpacity
-                style={styles.requirement}
-                key={requirement.id_requerimiento}
-                onPress={() => router.push(`/requirements/${requirement.id_requerimiento}`)}
-              >
-                <View style={styles.field}>
-                  <Text style={styles.fieldTitle}>Numero</Text>
-                  <Text style={styles.text}>{requirement.id_requerimiento}</Text>
-                </View>
-                <View style={styles.field}>
-                  <Text style={styles.fieldTitle}>Fecha de inicio</Text>
-                  <Text style={styles.text}>{formatDate(requirement.fecha_inicio)}</Text>
-                </View>
-                <View style={styles.field}>
-                  <Text style={styles.fieldTitle}>Fecha termino</Text>
-                  <Text style={styles.text}>{formatDate(requirement.fecha_fin)}</Text>
-                </View>
-                <View style={styles.field}>
-                  <Text style={styles.fieldTitle}>Estado</Text>
-                  <Text style={styles.text}>{requirement.estado}</Text>
-                </View>
-                <Text style={styles.viewText}>Ver</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      {loading ? (
+        <View>
+          <ActivityIndicator size="large" color="#00ff00" />
+        </View>
+      ):
+        <ScrollView>
+        <Text style={styles.title}>
+          {user?.rol === 'Cliente externo' && "Mis requerimientos"}
+          {user?.rol === 'Productor' && "Requerimientos activos"}
+        </Text>
+        <View style={styles.requirements}>
+          {requirements.length === 0 && <Text style={styles.text}>No hay requerimientos</Text>}
+          {estados.map((estado) => (
+            <View key={estado} style={styles.statusContainer}>
+              <Text style={styles.statusText}>Requerimientos {estado}</Text>
+              {filterRequirements(estado).map((requirement) => (
+                <TouchableOpacity
+                  style={styles.requirement}
+                  key={requirement.id_requerimiento}
+                  onPress={() => router.push(`/requirements/${requirement.id_requerimiento}`)}
+                >
+                  <View style={styles.field}>
+                    <Text style={styles.fieldTitle}>Numero</Text>
+                    <Text style={styles.text}>{requirement.id_requerimiento}</Text>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={styles.fieldTitle}>Fecha de inicio</Text>
+                    <Text style={styles.text}>{formatDate(requirement.fecha_inicio)}</Text>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={styles.fieldTitle}>Fecha termino</Text>
+                    <Text style={styles.text}>{formatDate(requirement.fecha_fin)}</Text>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={styles.fieldTitle}>Estado</Text>
+                    <Text style={styles.text}>{requirement.estado}</Text>
+                  </View>
+                  <Text style={styles.viewText}>Ver</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </View>
+      </ScrollView>}
+    </View>
   );
 }
 
