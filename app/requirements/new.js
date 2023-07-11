@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 const calidad_items = [
   { name: 'Fresca', value:'Fresca' },
@@ -142,6 +143,7 @@ const newRequirement = () => {
   }
 
 	return (
+    <KeyboardAwareScrollView>
 		<View
 			style={styles.container}
 		>
@@ -344,6 +346,7 @@ const newRequirement = () => {
 				</Text>
 			</TouchableOpacity>
 		</View>
+    </KeyboardAwareScrollView>
 	)
 }
 
