@@ -311,7 +311,7 @@ const newRequirement = () => {
                 color: "white"
               }}
               dropdownIconColor={"white"}
-              selectedValue={productos[index].cantidad}
+              selectedValue={productos[index].calidad}
               onValueChange={(itemValue, itemIndex) =>{
                 const newProductos = [...productos];
                 newProductos[index].calidad = itemValue;
